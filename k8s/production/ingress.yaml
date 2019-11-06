@@ -7,6 +7,16 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
+  - host: matrix.papers.tech
+    http:
+      paths:
+        - path: /.well-known/acme-challenge
+          backend:
+            serviceName: synapse-service
+            servicePort: 80
+        - backend:
+            serviceName: synapse-service
+            servicePort: 8448
   - host: matrix.prod.gke.papers.tech
     http:
       paths:

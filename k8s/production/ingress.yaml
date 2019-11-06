@@ -1,0 +1,19 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: synapse
+  namespace: tezos-matrix
+  annotations: 
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: matrix.prod.gke.papers.tech
+    http:
+      paths:
+        - path: /.well-known/acme-challenge
+          backend:
+            serviceName: synapse-service
+            servicePort: 80
+        - backend:
+            serviceName: synapse-service
+            servicePort: 8448

@@ -1,0 +1,36 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  GOOGLE_TAG: eu.gcr.io/papers-kubernetes/tezos-synapse:$CI_COMMIT_SHA
+image: tmaier/docker-compose:latest
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker build -t $GOOGLE_TAG .
+  tags:
+    - docker
+
+k8s-deploy-production:
+  stage: deploy
+  only:
+    - master
+  when: manual
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set compute/zone europe-west6-a
+    - gcloud container clusters get-credentials papers-cluster-production
+  script:
+    - kubectl apply -f ./k8s/common/namespace.yaml
+    - kubectl apply -f ./k8s/common/ --recursive
+    - kubectl apply -f ./k8s/production/ --recursive
+  
+  tags:
+    - docker

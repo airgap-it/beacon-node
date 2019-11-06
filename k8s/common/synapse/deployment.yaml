@@ -1,0 +1,48 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: synapse
+  namespace: tezos-matrix
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: synapse
+    spec:
+      containers:
+      - image: _TO_BE_REPLACED_BY_IMAGE_TAG_
+        imagePullPolicy: IfNotPresent
+        name: synapse
+        ports:
+          - containerPort: 8448
+          - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /_matrix
+            port: 8448
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        livenessProbe:
+          httpGet:
+            path: /_matrix
+            port: 8448
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        volumeMounts:
+          - mountPath: "/data"
+            name: synapse-pv
+            subPath: "data"
+          - name: synapse-homeserver-configuration
+            mountPath: /data/homeserver.yaml
+            subPath: homeserver.yaml  
+      restartPolicy: Always
+      volumes:
+        - name: synapse-pv
+          persistentVolumeClaim:
+            claimName: synapse-pvc
+        - name: synapse-homeserver-configuration
+          secret:
+            secretName: synapse-homeserver-configuration
+status: {}

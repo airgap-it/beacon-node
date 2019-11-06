@@ -17,7 +17,7 @@ spec:
         name: synapse
         ports:
           - containerPort: 8448
-          - containerPort: 80
+          - containerPort: 8080
         readinessProbe:
           httpGet:
             path: /_matrix

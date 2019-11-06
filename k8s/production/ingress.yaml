@@ -13,7 +13,7 @@ spec:
         - path: /.well-known/acme-challenge
           backend:
             serviceName: synapse-service
-            servicePort: 80
+            servicePort: 8080
         - backend:
             serviceName: synapse-service
             servicePort: 8448
@@ -23,7 +23,7 @@ spec:
         - path: /.well-known/acme-challenge
           backend:
             serviceName: synapse-service
-            servicePort: 80
+            servicePort: 8080
         - backend:
             serviceName: synapse-service
             servicePort: 8448

@@ -37,6 +37,18 @@ spec:
           - name: synapse-homeserver-configuration
             mountPath: /data/homeserver.yaml
             subPath: homeserver.yaml  
+          - name: synapse-homeserver-configuration
+            mountPath: /data/matrix.papers.tech.log.config
+            subPath: matrix.papers.tech.log.config
+          - name: synapse-homeserver-configuration
+            mountPath: /data/matrix.papers.tech.macaroon.key 
+            subPath: matrix.papers.tech.macaroon.key  
+          - name: synapse-homeserver-configuration
+            mountPath: /data/matrix.papers.tech.registration.key
+            subPath: matrix.papers.tech.registration.key 
+          - name: synapse-homeserver-configuration
+            mountPath: /data/matrix.papers.tech.signing.key       
+            subPath: matrix.papers.tech.signing.key         
       restartPolicy: Always
       volumes:
         - name: synapse-pv

@@ -12,18 +12,12 @@ spec:
       paths:
         - path: /.well-known/acme-challenge
           backend:
-            serviceName: synapse-service
+            serviceName: acme-service
             servicePort: 8080
-        - backend:
-            serviceName: synapse-service
-            servicePort: 8448
   - host: matrix.prod.gke.papers.tech
     http:
       paths:
         - path: /.well-known/acme-challenge
           backend:
-            serviceName: synapse-service
+            serviceName: acme-service
             servicePort: 8080
-        - backend:
-            serviceName: synapse-service
-            servicePort: 8448

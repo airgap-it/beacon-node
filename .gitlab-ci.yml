@@ -28,6 +28,7 @@ k8s-deploy-production:
     - gcloud config set compute/zone europe-west6-a
     - gcloud container clusters get-credentials papers-cluster-production
   script:
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/common/synapse/deployment.yaml
     - kubectl apply -f ./k8s/common/namespace.yaml
     - kubectl apply -f ./k8s/common/ --recursive
     - kubectl apply -f ./k8s/production/ --recursive

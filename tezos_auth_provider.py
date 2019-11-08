@@ -13,7 +13,7 @@ import logging
 import time
 
 from twisted.internet import defer
-from pytezos.crypto import Key
+import pysodium
 
 __version__ = "0.1"
 logger = logging.getLogger(__name__)
@@ -30,16 +30,18 @@ class TezosAuthProvider:
 
     @defer.inlineCallbacks
     def check_password(self, user_id: str, password: str):
-        localpart = user_id.split(":", 1)[0][1:]
-        signature_part = password.split(":", 1)[0]
-
+        public_key = user_id.split(":", 1)[0][1:]
+        #signature_type = password.split(":", 1)[0]
+        signature = bytes.fromhex(password.split(":")[1])
         try:
-            Key(localpart).verify(signature_part,
-                                  u"login{}".format(int(time.time()/(5*60))))
+            message_digest = pysodium.crypto_generichash(
+                u"login:{}".format(int(time.time()/(5*60))).encode())
+            pysodium.crypto_sign_verify_detached(
+                signature, message_digest, bytes.fromhex(public_key))
             if not (yield self.account_handler.check_user_exists(user_id)):
                 self.log.info(
-                    "First user login, registering: user=%r", user_id)
-                yield self.account_handler.register(localpart=localpart.lower())
+                    "First user login, registering: user=%r", user_id.lower())
+                yield self.account_handler.register(localpart=public_key)
             defer.returnValue(True)
         except Exception as exception:
             self.log.info(

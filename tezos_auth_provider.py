@@ -35,7 +35,7 @@ class TezosAuthProvider:
 
         try:
             Key(localpart).verify(signature_part,
-                                  "login{}".format(int(time.time()/(5*60))))
+                                  u"login{}".format(int(time.time()/(5*60))))
             if not (yield self.account_handler.check_user_exists(user_id)):
                 self.log.info(
                     "First user login, registering: user=%r", user_id)

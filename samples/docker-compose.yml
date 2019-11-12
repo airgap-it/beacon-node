@@ -1,0 +1,26 @@
+version: "3.5"
+
+services:
+  postgres:
+    image: postgres:12.0
+    environment:
+      - POSTGRES_USER=synapse
+      - POSTGRES_PASSWORD=synapsepassword
+      - POSTGRES_DB=synapse
+  tezos-synapse:
+    image: airgapdocker/tezos-synapse:v1.5.0-py3
+    #entrypoint: /bin/sh
+    #command: /bin/sh -c "/usr/local/bin/wait-for postgres:5432 -- /usr/local/bin/template_endpoint.sh"
+    depends_on:
+      - postgres      
+    ports:
+      - "8080:8080"
+      - "8448:8448"
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=synapse
+      - DB_PASS=synapsepassword
+      - DB_NAME=synapse
+      - SERVER_NAME=matrix.papers.tech
+    volumes:
+      - ./data/synapse-config:/data

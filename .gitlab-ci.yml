@@ -12,7 +12,7 @@ stages:
 build:
   stage: build
   script:
-    - docker build -t $GOOGLE_TAG .
+    - docker build -t $GOOGLE_TAG ./docker/
   tags:
     - docker
 

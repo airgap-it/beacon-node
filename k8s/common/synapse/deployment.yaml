@@ -15,34 +15,21 @@ spec:
       - image: _TO_BE_REPLACED_BY_IMAGE_TAG_
         imagePullPolicy: IfNotPresent
         name: synapse
+        envFrom:
+        - configMapRef:
+            name: synapse-config-map
+        - secretRef:
+            name: synapse-secret
         ports:
           - containerPort: 8448
           - containerPort: 8080
         volumeMounts:
           - mountPath: "/data"
             name: synapse-pv
-            subPath: "data"
-          - name: synapse-homeserver-configuration
-            mountPath: /data/homeserver.yaml
-            subPath: homeserver.yaml  
-          - name: synapse-homeserver-configuration
-            mountPath: /data/matrix.papers.tech.log.config
-            subPath: matrix.papers.tech.log.config
-          - name: synapse-homeserver-configuration
-            mountPath: /data/matrix.papers.tech.macaroon.key 
-            subPath: matrix.papers.tech.macaroon.key  
-          - name: synapse-homeserver-configuration
-            mountPath: /data/matrix.papers.tech.registration.key
-            subPath: matrix.papers.tech.registration.key 
-          - name: synapse-homeserver-configuration
-            mountPath: /data/matrix.papers.tech.signing.key       
-            subPath: matrix.papers.tech.signing.key         
+            subPath: "data"        
       restartPolicy: Always
       volumes:
         - name: synapse-pv
           persistentVolumeClaim:
             claimName: synapse-pvc
-        - name: synapse-homeserver-configuration
-          secret:
-            secretName: synapse-homeserver-configuration
 status: {}

@@ -1,7 +1,7 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
-  GOOGLE_TAG: eu.gcr.io/papers-kubernetes/tezos-synapse:$CI_COMMIT_SHA
-  GOOGLE_TAG_LATEST: eu.gcr.io/papers-kubernetes/tezos-synapse:latest
+  DOCKERHUB_TAG: airgapdocker/tezos-synapse:$CI_COMMIT_SHA
+  DOCKERHUB_TAG_LATEST: airgapdocker/tezos-synapse:latest
 image: tmaier/docker-compose:latest
 
 stages:
@@ -12,7 +12,7 @@ stages:
 build:
   stage: build
   script:
-    - docker build -t $GOOGLE_TAG ./docker/
+    - docker build -t $DOCKERHUB_TAG ./docker/
   tags:
     - docker
 
@@ -20,16 +20,11 @@ publish:
   stage: publish
   image: google/cloud-sdk
   before_script:
-    - echo $GCLOUD_GOOGLE_KEY > key.json
-    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set account $GCLOUD_ACCOUNT
-    - gcloud config set compute/zone $GCLOUD_ZONE
-    - gcloud config set project $GCLOUD_PROJECT
-    - gcloud auth configure-docker
+    - docker login -u "$DOCKERHUB_USER" -p "$DOCKERHUB_PASSWORD"
   script:
-    - docker tag $GOOGLE_TAG $GOOGLE_TAG_LATEST
-    - docker push $GOOGLE_TAG
-    - docker push $GOOGLE_TAG_LATEST
+    - docker tag $DOCKERHUB_TAG $DOCKERHUB_TAG_LATEST
+    - docker push $DOCKERHUB_TAG
+    - docker push $DOCKERHUB_TAG_LATEST
   only:
     - master
     - development
@@ -50,7 +45,7 @@ k8s-deploy-production:
     - gcloud config set compute/zone europe-west6-a
     - gcloud container clusters get-credentials papers-cluster-production
   script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/common/synapse/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/common/synapse/deployment.yaml
     - kubectl apply -f ./k8s/common/namespace.yaml
     - kubectl apply -f ./k8s/common/ --recursive
     - kubectl apply -f ./k8s/production/ --recursive

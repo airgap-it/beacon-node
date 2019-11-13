@@ -3,6 +3,7 @@ pid_file: /data/homeserver.pid
 
 ## Federation ## 
 federation_domain_whitelist:
+  - matrix-dev.papers.tech
   - matrix.papers.tech
   - matrix.tez.ie
   - matrix.stove-labs.com

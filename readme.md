@@ -21,9 +21,13 @@ We require a postgres database connection. The environment variable ``SERVER_NAM
 
 ## Service Ports
 
-Port 8080 is required for letsencrypt to do its magic and setup TLS properly, so that your production server can be used in combination with federation.
+Port 8008 is required for the actual matrix service and will be your endpoint.
 
-Port 8448 is required for the actual matrix service and will be your endpoint.
+Note: in order for federation to work you will need:
+
+1. SSL/TLS enabled for your domain 
+2. have that SSL/TLS setup for port 8448
+3. forward SSL/TLS traffic from 8448 to 8008 of this container
 
 ## Running synapse using docker
 
@@ -45,7 +49,7 @@ docker run -d --name synapse \
 
 ## Running synapse using docker-compose
 
-You can start synapse as follows (currently we support only postgres setups and expect that the domain given in "SERVER_NAME" is also where this container will be reachable on port 8080 for the letsencrypt request):
+You can start synapse as follows (currently we support only postgres setups and expect that the domain given in "SERVER_NAME" is also where this container will be reachable):
 
 ```
 git clone 

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: synapse-config-map
+  namespace: tezos-matrix
+data:
+  SERVER_NAME: "matrix-dev.papers.tech"

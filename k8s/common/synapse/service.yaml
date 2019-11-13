@@ -6,24 +6,9 @@ metadata:
 spec:
   ports:
   - name: client
-    port: 8448
-    targetPort: 8448
+    port: 8008
+    targetPort: 8008
     protocol: TCP  
   type: NodePort
-  selector:
-    app: synapse
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: acme-service
-  namespace: tezos-matrix
-spec:
-  ports:
-  - name: acme
-    port: 8080
-    targetPort: 8080
-    protocol: TCP  
-  type: ClusterIP
   selector:
     app: synapse

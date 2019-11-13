@@ -21,23 +21,25 @@ federation_ip_range_blacklist:
 
 ## Listening Ports ##
 listeners:
-  - port: 8448
+  - port: 8008
     type: http
-    tls: true
+    tls: false # see https://github.com/matrix-org/synapse/issues/5872
+    x_forwarded: true
     resources:
       - names: [client, federation]
 
-tls_certificate_path: "/data/{{SERVER_NAME}}.tls.crt"
-tls_private_key_path: "/data/{{SERVER_NAME}}.tls.key"
+#tls_certificate_path: "/data/{{SERVER_NAME}}.tls.crt"
+#tls_private_key_path: "/data/{{SERVER_NAME}}.tls.key"
 
 ## Letsencrypt ##
-acme:
-    enabled: true
-    port: 8080
-    bind_addresses: ['::', '0.0.0.0']
-    reprovision_threshold: 30
-    domain: {{SERVER_NAME}}
-    account_key_file: /data/acme_account.key
+# this is currently broken see https://github.com/matrix-org/synapse/issues/5872
+#acme:
+#    enabled: true
+#    port: 8080
+#    bind_addresses: ['::', '0.0.0.0']
+#    reprovision_threshold: 30
+#    domain: {{SERVER_NAME}}
+#    account_key_file: /data/acme_account.key
 
 ## Database ##
 database:

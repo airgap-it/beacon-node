@@ -21,8 +21,7 @@ spec:
         - secretRef:
             name: synapse-secret
         ports:
-          - containerPort: 8448
-          - containerPort: 8080
+          - containerPort: 8008
         volumeMounts:
           - mountPath: "/data"
             name: synapse-pv

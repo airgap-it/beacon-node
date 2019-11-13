@@ -17,11 +17,11 @@ spec:
     http:
       paths:
         - backend:
-            serviceName: acme-service
+            serviceName: synapse-service
             servicePort: 8008
   - host: matrix.dev.gke.papers.tech
     http:
       paths:
         - backend:
-            serviceName: acme-service
+            serviceName: synapse-service
             servicePort: 8008

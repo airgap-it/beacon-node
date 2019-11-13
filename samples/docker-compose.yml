@@ -12,8 +12,7 @@ services:
     depends_on:
       - postgres      
     ports:
-      - "8080:8080"
-      - "8448:8448"
+      - "8008:8008"
     environment:
       - DB_HOST=postgres
       - DB_USER=synapse

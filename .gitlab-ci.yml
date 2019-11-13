@@ -42,13 +42,89 @@ k8s-deploy-production:
     - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
     - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set project $GCLOUD_PROJECT
-    - gcloud config set compute/zone europe-west6-a
+    - gcloud config set compute/zone $GCLOUD_ZONE
     - gcloud container clusters get-credentials papers-cluster-production
   script:
     - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/common/synapse/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DB_HOST_|"$DB_HOST"|g" k8s/production/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DB_PASS_|"$DB_PASS"|g" k8s/production/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DB_NAME_|"$DB_NAME"|g" k8s/production/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DB_USER_|"$DB_USER"|g" k8s/production/secret.yaml
+    
     - kubectl apply -f ./k8s/common/namespace.yaml
     - kubectl apply -f ./k8s/common/ --recursive
     - kubectl apply -f ./k8s/production/ --recursive
   
   tags:
     - docker
+
+k8s-deploy-development:
+  stage: deploy
+  only:
+    - master
+  when: manual
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set compute/zone $GCLOUD_ZONE_DEVELOPMENT
+    - gcloud container clusters get-credentials papers-cluster-development
+  script:
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/common/synapse/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DB_HOST_|"$DB_HOST"|g" k8s/development/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DB_PASS_|"$DB_PASS"|g" k8s/development/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DB_NAME_|"$DB_NAME"|g" k8s/development/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DB_USER_|"$DB_USER"|g" k8s/development/secret.yaml
+    
+    - kubectl apply -f ./k8s/common/namespace.yaml
+    - kubectl apply -f ./k8s/common/ --recursive
+    - kubectl apply -f ./k8s/development/ --recursive
+  
+  tags:
+    - docker
+
+provision-db-development:
+  stage: provision
+  only:
+    - develop
+    - master
+  when: manual
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set compute/zone $GCLOUD_ZONE_DEVELOPMENT
+    - gcloud container clusters get-credentials papers-cluster-development
+    - export STOLON_PROXY=$(kubectl get pods --all-namespaces | grep stolon-proxy | awk 'NR==1{print $2}')
+  script:
+    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE DATABASE $DB_NAME\""  || true
+    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASS'\""
+    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME to $DB_USER\""
+  tags:
+    - docker   
+
+provision-db-production:
+  stage: provision
+  only:
+    - develop
+    - master
+  when: manual
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set compute/zone $GCLOUD_ZONE
+    - gcloud container clusters get-credentials papers-cluster-production
+    - export STOLON_PROXY=$(kubectl get pods --all-namespaces | grep stolon-proxy | awk 'NR==1{print $2}')
+  script:
+    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE DATABASE $DB_NAME\""  || true
+    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASS'\""
+    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME to $DB_USER\""
+  tags:
+    - docker   

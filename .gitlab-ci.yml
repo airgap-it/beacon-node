@@ -47,7 +47,7 @@ k8s-deploy-production:
     - gcloud container clusters get-credentials papers-cluster-production
   script:
     - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/common/synapse/deployment.yaml
-    - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_HOST_|"$PROD_DEV_DB_HOST"|g" k8s/production/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_HOST_|"$PROD_DB_HOST"|g" k8s/production/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_PASS_|"$PROD_DB_PASS"|g" k8s/production/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_NAME_|"$PROD_DB_NAME"|g" k8s/production/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_USER_|"$PROD_DB_USER"|g" k8s/production/secret.yaml

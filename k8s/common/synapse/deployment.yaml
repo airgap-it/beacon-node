@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: synapse
-  namespace: tezos-matrix
+  namespace: beacon-matrix
 spec:
   strategy:
     type: Recreate
@@ -12,20 +12,20 @@ spec:
         app: synapse
     spec:
       containers:
-      - image: _TO_BE_REPLACED_BY_IMAGE_TAG_
-        imagePullPolicy: IfNotPresent
-        name: synapse
-        envFrom:
-        - configMapRef:
-            name: synapse-config-map
-        - secretRef:
-            name: synapse-secret
-        ports:
-          - containerPort: 8008
-        volumeMounts:
-          - mountPath: "/data"
-            name: synapse-pv
-            subPath: "data"        
+        - image: _TO_BE_REPLACED_BY_IMAGE_TAG_
+          imagePullPolicy: IfNotPresent
+          name: synapse
+          envFrom:
+            - configMapRef:
+                name: synapse-config-map
+            - secretRef:
+                name: synapse-secret
+          ports:
+            - containerPort: 8008
+          volumeMounts:
+            - mountPath: "/data"
+              name: synapse-pv
+              subPath: "data"
       restartPolicy: Always
       volumes:
         - name: synapse-pv

@@ -2,12 +2,11 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: synapse-pvc
-  namespace: tezos-matrix
+  namespace: beacon-matrix
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
-     requests:
-       storage: 1Gi
+    requests:
+      storage: 1Gi
   storageClassName: standard
-

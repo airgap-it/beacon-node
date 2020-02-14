@@ -2,13 +2,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: synapse-service
-  namespace: tezos-matrix
+  namespace: beacon-matrix
 spec:
   ports:
-  - name: client
-    port: 8008
-    targetPort: 8008
-    protocol: TCP  
+    - name: client
+      port: 8008
+      targetPort: 8008
+      protocol: TCP
   type: NodePort
   selector:
     app: synapse

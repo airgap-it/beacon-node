@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: synapse-service
-  namespace: beacon-matrix
+  namespace: beacon-node
 spec:
   ports:
     - name: client

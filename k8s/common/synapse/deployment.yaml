@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: synapse
-  namespace: beacon-matrix
+  namespace: beacon-node
 spec:
   strategy:
     type: Recreate

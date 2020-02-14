@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: beacon-matrix
-  namespace: beacon-matrix
+  name: beacon-node
+  namespace: beacon-node
 spec:
   limits:
     - default:

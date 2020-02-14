@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: synapse-pvc
-  namespace: beacon-matrix
+  namespace: beacon-node
 spec:
   accessModes:
     - ReadWriteOnce

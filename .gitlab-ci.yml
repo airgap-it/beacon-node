@@ -1,7 +1,7 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
-  DOCKERHUB_TAG: airgapdocker/tezos-synapse:$CI_COMMIT_SHA
-  DOCKERHUB_TAG_LATEST: airgapdocker/tezos-synapse:latest
+  DOCKERHUB_TAG: airgapdocker/beacon-node:$CI_COMMIT_SHA
+  DOCKERHUB_TAG_LATEST: airgapdocker/beacon-node:latest
 image: tmaier/docker-compose:latest
 
 stages:
@@ -51,11 +51,11 @@ k8s-deploy-production:
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_PASS_|"$PROD_DB_PASS"|g" k8s/production/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_NAME_|"$PROD_DB_NAME"|g" k8s/production/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_USER_|"$PROD_DB_USER"|g" k8s/production/secret.yaml
-    
+
     - kubectl apply -f ./k8s/common/namespace.yaml
     - kubectl apply -f ./k8s/common/ --recursive
     - kubectl apply -f ./k8s/production/ --recursive
-  
+
   tags:
     - docker
 
@@ -78,11 +78,11 @@ k8s-deploy-development:
     - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_PASS_|"$DEV_DB_PASS"|g" k8s/development/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_NAME_|"$DEV_DB_NAME"|g" k8s/development/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_USER_|"$DEV_DB_USER"|g" k8s/development/secret.yaml
-    
+
     - kubectl apply -f ./k8s/common/namespace.yaml
     - kubectl apply -f ./k8s/common/ --recursive
     - kubectl apply -f ./k8s/development/ --recursive
-  
+
   tags:
     - docker
 
@@ -106,7 +106,7 @@ provision-db-development:
     - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASS'\""
     - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME to $DB_USER\""
   tags:
-    - docker   
+    - docker
 
 provision-db-production:
   stage: provision
@@ -128,4 +128,4 @@ provision-db-production:
     - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASS'\""
     - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME to $DB_USER\""
   tags:
-    - docker   
+    - docker

@@ -1,3 +1,5 @@
+![Docker Pulls](https://img.shields.io/docker/pulls/airgapdocker/beacon-node)
+
 # Beacon Node Docker
 
 This Docker image will run Synapse as a single process and is a fork of the matrixdotorg/synapse docker image.

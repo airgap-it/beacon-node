@@ -1,4 +1,4 @@
-![Docker Pulls](https://img.shields.io/docker/pulls/airgapdocker/beacon-node)
+[![Docker Pulls](https://img.shields.io/docker/pulls/airgapdocker/beacon-node)](https://hub.docker.com/r/airgapdocker/beacon-node)
 
 # Beacon Node Docker
 

@@ -104,7 +104,7 @@ enable_registration: false
 use_presence: false
 require_auth_for_profile_requests: true
 allow_public_rooms_without_auth: false
-allow_public_rooms_over_federation: false
+allow_public_rooms_over_federation: true
 enable_search: false
 allow_per_room_profiles: false
 redaction_retention_period: 1d

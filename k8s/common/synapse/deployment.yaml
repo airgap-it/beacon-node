@@ -1,9 +1,14 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: synapse
   namespace: beacon-node
+  labels:
+    app: synapse
 spec:
+  selector:
+    matchLabels:
+      app: synapse
   strategy:
     type: Recreate
   template:

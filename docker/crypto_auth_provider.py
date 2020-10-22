@@ -35,12 +35,12 @@ class CryptoAuthProvider:
         signature = bytes.fromhex(password.split(":")[1])
         public_key = bytes.fromhex(password.split(":")[2])
 
-        public_key_digest = pysodium.crypto_generichash(public_key)
+        public_key_digest = pysodium.crypto_generichash(public_key, outlen=20)
 
         if public_key_hash.hex() == public_key_digest.hex():
             try:
                 message_digest = pysodium.crypto_generichash(
-                    u"login:{}".format(int(time.time()/(5*60))).encode())
+                    u"login:{}".format(int(time.time()/(5*60))).encode(), outlen=32)
                 pysodium.crypto_sign_verify_detached(
                     signature, message_digest, public_key)
                 if not (yield self.account_handler.check_user_exists(user_id)):

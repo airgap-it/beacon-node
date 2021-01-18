@@ -120,6 +120,7 @@ provision-db-dev-1:
   only:
     - develop
     - master
+    - chore/multi-dev-deployment
   when: manual
   image: google/cloud-sdk
   before_script:
@@ -142,6 +143,7 @@ provision-db-dev-2:
   only:
     - develop
     - master
+    - chore/multi-dev-deployment
   when: manual
   image: google/cloud-sdk
   before_script:

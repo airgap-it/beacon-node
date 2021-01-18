@@ -134,7 +134,7 @@ provision-db-dev-1:
   script:
     - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"CREATE DATABASE $DEV_1_DB_NAME\""  || true
     - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DEV_1_DB_PASS'\""
-    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME to $DEV_1_DB_USER\""
+    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DEV_1_DB_NAME to $DEV_1_DB_USER\""
   tags:
     - docker
 
@@ -157,7 +157,7 @@ provision-db-dev-2:
   script:
     - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"CREATE DATABASE $DEV_2_DB_NAME\""  || true
     - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DEV_2_DB_PASS'\""
-    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME to $DEV_2_DB_USER\""
+    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DEV_2_DB_NAME to $DEV_2_DB_USER\""
   tags:
     - docker
 

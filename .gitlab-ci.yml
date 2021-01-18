@@ -103,7 +103,7 @@ k8s-deploy-dev-2:
     - gcloud config set compute/zone $GCLOUD_ZONE_DEVELOPMENT
     - gcloud container clusters get-credentials papers-cluster-development
   script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/common/development_2/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/common/development_2/synapse/deployment.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_HOST_|"$DEV_DB_HOST"|g" k8s/development_2/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_PASS_|"$DEV_2_DB_PASS"|g" k8s/development_2/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_NAME_|"$DEV_2_DB_NAME"|g" k8s/development_2/secret.yaml

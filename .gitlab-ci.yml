@@ -83,7 +83,7 @@ k8s-deploy-dev-1:
 
     - kubectl apply -f ./k8s/common/namespace.yaml
     - kubectl apply -f ./k8s/common/ --recursive
-    - kubectl apply -f ./k8s/development/ --recursive
+    - kubectl apply -f ./k8s/development_1/ --recursive
 
   tags:
     - docker
@@ -111,7 +111,7 @@ k8s-deploy-dev-2:
 
     - kubectl apply -f ./k8s/common/namespace.yaml
     - kubectl apply -f ./k8s/common/ --recursive
-    - kubectl apply -f ./k8s/development/ --recursive
+    - kubectl apply -f ./k8s/development_2/ --recursive
 
   tags:
     - docker

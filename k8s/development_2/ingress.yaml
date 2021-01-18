@@ -10,7 +10,7 @@ spec:
   tls:
     - hosts:
         - matrix.dev-1.gke.papers.tech
-      secretName: matrix-synapse-prod-tls
+      secretName: synapse-dev-2-tls
   rules:
     - host: matrix.dev-2.gke.papers.tech
       http:

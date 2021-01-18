@@ -1,5 +1,8 @@
 #!/bin/sh
 HS_PATH="/config/$HS_FILE_NAME"
+
+echo "Using config path: $HS_PATH"
+
 sed -i "s/{{SERVER_NAME}}/$SERVER_NAME/g" $HS_PATH
 sed -i "s/{{DB_HOST}}/$DB_HOST/g" $HS_PATH
 sed -i "s/{{DB_USER}}/$DB_USER/g" $HS_PATH

@@ -46,7 +46,7 @@ k8s-deploy-production:
     - gcloud config set compute/zone $GCLOUD_ZONE
     - gcloud container clusters get-credentials papers-cluster-production
   script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/common/synapse/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/production/synapse/deployment.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_HOST_|"$PROD_DB_HOST"|g" k8s/production/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_PASS_|"$PROD_DB_PASS"|g" k8s/production/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_NAME_|"$PROD_DB_NAME"|g" k8s/production/secret.yaml
@@ -59,10 +59,11 @@ k8s-deploy-production:
   tags:
     - docker
 
-k8s-deploy-development:
+k8s-deploy-dev-1:
   stage: deploy
   only:
     - master
+    - chore/multi-dev-deployment
   when: manual
   image: google/cloud-sdk
   before_script:
@@ -73,11 +74,11 @@ k8s-deploy-development:
     - gcloud config set compute/zone $GCLOUD_ZONE_DEVELOPMENT
     - gcloud container clusters get-credentials papers-cluster-development
   script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/common/synapse/deployment.yaml
-    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_HOST_|"$DEV_DB_HOST"|g" k8s/development/secret.yaml
-    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_PASS_|"$DEV_DB_PASS"|g" k8s/development/secret.yaml
-    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_NAME_|"$DEV_DB_NAME"|g" k8s/development/secret.yaml
-    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_USER_|"$DEV_DB_USER"|g" k8s/development/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/development_1/synapse/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_HOST_|"$DEV_DB_HOST"|g" k8s/development_1/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_PASS_|"$DEV_1_DB_PASS"|g" k8s/development_1/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_NAME_|"$DEV_1_DB_NAME"|g" k8s/development_1/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_USER_|"$DEV_1_DB_USER"|g" k8s/development_1/secret.yaml
 
     - kubectl apply -f ./k8s/common/namespace.yaml
     - kubectl apply -f ./k8s/common/ --recursive
@@ -86,7 +87,35 @@ k8s-deploy-development:
   tags:
     - docker
 
-provision-db-development:
+k8s-deploy-dev-2:
+  stage: deploy
+  only:
+    - master
+    - chore/multi-dev-deployment
+  when: manual
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set compute/zone $GCLOUD_ZONE_DEVELOPMENT
+    - gcloud container clusters get-credentials papers-cluster-development
+  script:
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/common/development_2/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_HOST_|"$DEV_DB_HOST"|g" k8s/development_2/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_PASS_|"$DEV_2_DB_PASS"|g" k8s/development_2/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_NAME_|"$DEV_2_DB_NAME"|g" k8s/development_2/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_USER_|"$DEV_2_DB_USER"|g" k8s/development_2/secret.yaml
+
+    - kubectl apply -f ./k8s/common/namespace.yaml
+    - kubectl apply -f ./k8s/common/ --recursive
+    - kubectl apply -f ./k8s/development/ --recursive
+
+  tags:
+    - docker
+
+provision-db-dev-1:
   stage: provision
   only:
     - develop
@@ -102,9 +131,31 @@ provision-db-development:
     - gcloud container clusters get-credentials papers-cluster-development
     - export STOLON_PROXY=$(kubectl get pods --all-namespaces | grep stolon-proxy | awk 'NR==1{print $2}')
   script:
-    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"CREATE DATABASE $DB_NAME\""  || true
-    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DB_PASS'\""
-    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME to $DB_USER\""
+    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"CREATE DATABASE $DEV_1_DB_NAME\""  || true
+    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DEV_1_DB_PASS'\""
+    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME to $DEV_1_DB_USER\""
+  tags:
+    - docker
+
+provision-db-dev-2:
+  stage: provision
+  only:
+    - develop
+    - master
+  when: manual
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set compute/zone $GCLOUD_ZONE_DEVELOPMENT
+    - gcloud container clusters get-credentials papers-cluster-development
+    - export STOLON_PROXY=$(kubectl get pods --all-namespaces | grep stolon-proxy | awk 'NR==1{print $2}')
+  script:
+    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"CREATE DATABASE $DEV_2_DB_NAME\""  || true
+    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$DEV_2_DB_PASS'\""
+    - kubectl exec $STOLON_PROXY --namespace="development-postgresql" -- bash -c "export PGPASSWORD=$PG_DEV_MASTER_PASSWORD && psql --host=localhost --username=$PG_DEV_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME to $DEV_2_DB_USER\""
   tags:
     - docker
 

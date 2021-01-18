@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: synapse-dev-2-service
+  namespace: beacon-node
+spec:
+  ports:
+    - name: client
+      port: 8008
+      targetPort: 8008
+      protocol: TCP
+  type: NodePort
+  selector:
+    app: synapse-dev-2

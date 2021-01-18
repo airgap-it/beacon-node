@@ -5,3 +5,4 @@ metadata:
   namespace: beacon-node
 data:
   SERVER_NAME: "matrix.papers.tech"
+  HS_FILE_NAME: "homeserver.yaml"

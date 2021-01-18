@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: synapse-dev-1
+  namespace: beacon-node
+  labels:
+    app: synapse-dev-1
+spec:
+  selector:
+    matchLabels:
+      app: synapse-dev-1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: synapse-dev-1
+    spec:
+      containers:
+        - image: _TO_BE_REPLACED_BY_IMAGE_TAG_
+          imagePullPolicy: IfNotPresent
+          name: synapse-dev-1
+          envFrom:
+            - configMapRef:
+                name: synapse-dev-1-config-map
+            - secretRef:
+                name: synapse-dev-1-secret
+          ports:
+            - containerPort: 8008
+          volumeMounts:
+            - mountPath: "/data"
+              name: synapse-dev-1-pv
+              subPath: "data"
+      restartPolicy: Always
+      volumes:
+        - name: synapse-dev-1-pv
+          persistentVolumeClaim:
+            claimName: synapse-dev-1-pvc
+status: {}

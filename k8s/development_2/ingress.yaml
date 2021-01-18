@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: synapse
+  name: synapse-dev-2
   namespace: beacon-node
   annotations:
     kubernetes.io/ingress.class: "nginx"
@@ -9,19 +9,12 @@ metadata:
 spec:
   tls:
     - hosts:
-        - matrix-dev.papers.tech
-        - matrix.dev.gke.papers.tech
+        - matrix.dev-1.gke.papers.tech
       secretName: matrix-synapse-prod-tls
   rules:
-    - host: matrix-dev.papers.tech
+    - host: matrix.dev-2.gke.papers.tech
       http:
         paths:
           - backend:
-              serviceName: synapse-service
-              servicePort: 8008
-    - host: matrix.dev.gke.papers.tech
-      http:
-        paths:
-          - backend:
-              serviceName: synapse-service
+              serviceName: synapse-dev-2-service
               servicePort: 8008

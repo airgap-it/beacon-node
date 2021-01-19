@@ -9,7 +9,7 @@ metadata:
 spec:
   tls:
     - hosts:
-        - matrix-1.dev.gke.papers.tech
+        - matrix-2.dev.gke.papers.tech
       secretName: synapse-dev-2-tls
   rules:
     - host: matrix-2.dev.gke.papers.tech

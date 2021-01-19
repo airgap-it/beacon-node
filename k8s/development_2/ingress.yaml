@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - matrix.dev-1.gke.papers.tech
+        - matrix-1.dev.gke.papers.tech
       secretName: synapse-dev-2-tls
   rules:
-    - host: matrix.dev-2.gke.papers.tech
+    - host: matrix-2.dev.gke.papers.tech
       http:
         paths:
           - backend:

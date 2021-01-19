@@ -4,5 +4,5 @@ metadata:
   name: synapse-dev-2-config-map
   namespace: beacon-node
 data:
-  SERVER_NAME: "matrix.dev-2.gke.papers.tech"
+  SERVER_NAME: "matrix-2.dev.gke.papers.tech"
   HS_FILE_NAME: "homeserver-dev.yaml"

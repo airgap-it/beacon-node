@@ -3,8 +3,8 @@ pid_file: /data/homeserver.pid
 
 ## Federation ## 
 federation_domain_whitelist:
-  - matrix.dev-1.gke.papers.tech
-  - matrix.dev-2.gke.papers.tech
+  - matrix-1.dev.gke.papers.tech
+  - matrix-2.dev.gke.papers.tech
 
 federation_ip_range_blacklist:
   - '127.0.0.0/8'

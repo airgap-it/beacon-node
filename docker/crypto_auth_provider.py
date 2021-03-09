@@ -41,11 +41,27 @@ class CryptoAuthProvider:
             current_time_window = int(time.time()/(5*60))
             try:
                 # Checking the current time window (+5min)
-                check_signature(signature, public_key, current_time_window)
+                message_digest = pysodium.crypto_generichash(
+                    u"login:{}".format(current_time_window).encode())
+                pysodium.crypto_sign_verify_detached(
+                    signature, message_digest, public_key)
+                if not (yield self.account_handler.check_user_exists(user_id)):
+                    self.log.info(
+                        "First user login, registering: user=%r", user_id.lower())
+                    yield self.account_handler.register(localpart=public_key_digest.hex())
+                defer.returnValue(True)
             except Exception as exception1:
                 try:
                     # Checking the previous time window (-5min)
-                    check_signature(signature, public_key, current_time_window - 1)
+                    message_digest = pysodium.crypto_generichash(
+                        u"login:{}".format(current_time_window-1).encode())
+                    pysodium.crypto_sign_verify_detached(
+                        signature, message_digest, public_key)
+                    if not (yield self.account_handler.check_user_exists(user_id)):
+                        self.log.info(
+                            "First user login, registering: user=%r", user_id.lower())
+                        yield self.account_handler.register(localpart=public_key_digest.hex())
+                    defer.returnValue(True)
                 except Exception as exception2:
                     self.log.info(
                         "Got exception while verifying signature: "+str(exception2))
@@ -55,17 +71,6 @@ class CryptoAuthProvider:
             self.log.info(
                 "pubkey hash did not match pubkey")
             defer.returnValue(False)
-
-    def check_signature(self, signature: str, public_key: str, time_window: int):
-        message_digest = pysodium.crypto_generichash(
-            u"login:{}".format(time_window).encode())
-        pysodium.crypto_sign_verify_detached(
-            signature, message_digest, public_key)
-        if not (yield self.account_handler.check_user_exists(user_id)):
-            self.log.info(
-                "First user login, registering: user=%r", user_id.lower())
-            yield self.account_handler.register(localpart=public_key_digest.hex())
-        defer.returnValue(True)
 
     @staticmethod
     def parse_config(config):

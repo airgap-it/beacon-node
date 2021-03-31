@@ -8,6 +8,7 @@ federation_domain_whitelist:
   - matrix.tez.ie
   - matrix.stove-labs.com
   - yadayada.cryptonomic-infra.tech
+  - beacon.tztip.me
 
 federation_ip_range_blacklist:
   - '127.0.0.0/8'

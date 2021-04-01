@@ -32,15 +32,15 @@ Note: in order for federation to work you will need:
 3. forward SSL/TLS traffic from 8448 to 8008 of this container
 4. forward SSL/TLS traffic from 443 to 8008 of this container
 
-## Running synapse using docker
+## Running beacon-node using docker
 
-You can start synapse as follows (currently we support only postgres setups and expect that the domain given in "SERVER_NAME" is also where this container will be reachable on port 8080 for the letsencrypt request):
+You can start beacon-node as follows (currently we support only postgres setups and expect that the domain given in "SERVER_NAME" is also where this container will be reachable on port 8080 for the letsencrypt request):
 
 ```
-docker run -d --name synapse \
+docker run -d --name beacon-node \
     --mount type=volume,src=synapse-data,dst=/data \
     -p 8080:8080 \
-    -p 8009:8008 \
+    -p 8008:8008 \
     -e SERVER_NAME=matrix.example.com \
     -e DB_HOST=postgres \
     -e DB_USER=synapse \
@@ -49,18 +49,18 @@ docker run -d --name synapse \
     airgapdocker/beacon-node:latest
 ```
 
-## Running synapse using docker-compose
+## Running beacon-node using docker-compose
 
-You can start synapse as follows (currently we support only postgres setups and expect that the domain given in "SERVER_NAME" is also where this container will be reachable):
+You can start beacon-node as follows (currently we support only postgres setups and expect that the domain given in "SERVER_NAME" is also where this container will be reachable):
 
 ```
 git clone
-cd tezos-synapse/samples
+cd beacon-node/samples
 vim docker-compose.yml # edit according to your likings: SERVER_NAME must be changed!
 docker-compose up -d
 ```
 
-## Nginx configuration
+## Sample Nginx configuration
 
 This is a sample configuration of `nginx` that will route all the traffic to the correct port. The certificates were added by Certbot and provided by letsencrypt.
 
@@ -74,7 +74,7 @@ server {
     location / {
         proxy_set_header   X-Forwarded-For $remote_addr;
         proxy_set_header   Host $http_host;
-        proxy_pass         http://localhost:8009;
+        proxy_pass         http://localhost:8008;
     }
 
     listen [::]:443 ssl ipv6only=on; # managed by Certbot
@@ -86,10 +86,10 @@ server {
 }
 ```
 
-## Running synapse using kubernetes
+## Running beacon-node using kubernetes
 
 See the k8s folder in this project for a production ready k8s setup.
 
-## Running synapse directly
+## Running beacon-node directly
 
-Our requirements to any synapse installation are minimal. Check `docker/homeserver.yaml` for the configuration and make sure to place `docker/crypto_auth_provider.py` to a place where it can be picked up by synapse (the Dockerfile is quite straight forward and the best documentation).
+Our requirements to any beacon-node installation are minimal. Check `docker/homeserver.yaml` for the configuration and make sure to place `docker/crypto_auth_provider.py` to a place where it can be picked up by beacon-node (the Dockerfile is quite straight forward and the best documentation).

@@ -12,7 +12,7 @@ services:
     depends_on:
       - postgres
     ports:
-      - "8009:8008" # 8009 is exposed. Route all traffic from port 443 and 8448 to this port
+      - "8008:8008" # 8008 is exposed. Route all traffic from port 443 and 8448 to this port
     environment:
       - DB_HOST=postgres
       - DB_USER=synapse

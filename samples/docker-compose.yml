@@ -8,11 +8,11 @@ services:
       - POSTGRES_PASSWORD=synapsepassword
       - POSTGRES_DB=synapse
   tezos-synapse:
-    image: airgapdocker/tezos-synapse:v1.5.0-py3
+    image: airgapdocker/beacon-node:latest
     depends_on:
-      - postgres      
+      - postgres
     ports:
-      - "8008:8008"
+      - "8009:8008" # 8009 is exposed. Route all traffic from port 443 and 8448 to this port
     environment:
       - DB_HOST=postgres
       - DB_USER=synapse

@@ -28,8 +28,9 @@ Port 8008 is required for the actual matrix service and will be your endpoint.
 Note: in order for federation to work you will need:
 
 1. SSL/TLS enabled for your domain
-2. have that SSL/TLS setup for port 8448
+2. have that SSL/TLS setup for port 8448 and 443
 3. forward SSL/TLS traffic from 8448 to 8008 of this container
+4. forward SSL/TLS traffic from 443 to 8008 of this container
 
 ## Running synapse using docker
 
@@ -39,13 +40,13 @@ You can start synapse as follows (currently we support only postgres setups and 
 docker run -d --name synapse \
     --mount type=volume,src=synapse-data,dst=/data \
     -p 8080:8080 \
-    -p 8448:8448 \
+    -p 8009:8008 \
     -e SERVER_NAME=matrix.example.com \
     -e DB_HOST=postgres \
     -e DB_USER=synapse \
     -e DB_NAME=synapse \
     -e DB_PASS=password \
-    airgapdocker/tezos-synapse:v1.5.0-py3
+    airgapdocker/beacon-node:latest
 ```
 
 ## Running synapse using docker-compose
@@ -57,6 +58,32 @@ git clone
 cd tezos-synapse/samples
 vim docker-compose.yml # edit according to your likings: SERVER_NAME must be changed!
 docker-compose up -d
+```
+
+## Nginx configuration
+
+This is a sample configuration of `nginx` that will route all the traffic to the correct port. The certificates were added by Certbot and provided by letsencrypt.
+
+```nginx
+server {
+    listen 8448 ssl;
+    listen [::]:8448 ssl;
+
+    server_name MY_SERVER_DOMAIN;
+
+    location / {
+        proxy_set_header   X-Forwarded-For $remote_addr;
+        proxy_set_header   Host $http_host;
+        proxy_pass         http://localhost:8009;
+    }
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/MY_SERVER_DOMAIN/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/MY_SERVER_DOMAIN/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
 ```
 
 ## Running synapse using kubernetes

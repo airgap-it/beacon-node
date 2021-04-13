@@ -125,7 +125,7 @@ provision-db-production:
     - export STOLON_PROXY=$(kubectl get pods --all-namespaces | grep stolon-proxy | awk 'NR==1{print $2}')
   script:
     - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE DATABASE synapse_prod_2\""  || true
-    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE USER $DB_USER WITH ENCRYPTED PASSWORD '$PROD_DB_PASS'\""
-    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME to $DB_USER\""
+    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE USER $PROD_DB_USER WITH ENCRYPTED PASSWORD '$PROD_DB_PASS'\""
+    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $DB_NAME to $PROD_DB_USER\""
   tags:
     - docker

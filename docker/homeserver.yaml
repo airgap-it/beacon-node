@@ -86,7 +86,7 @@ allow_guest_access: false
 
 report_stats: false
 
-signing_key_path: "/data/signing.key"
+signing_key_path: "/config/signing.key"
 
 trusted_key_servers: []
 

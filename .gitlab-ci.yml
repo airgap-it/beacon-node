@@ -49,7 +49,7 @@ k8s-deploy-production:
     - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$DOCKERHUB_TAG"|g" k8s/common/synapse/deployment.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_HOST_|"$PROD_DB_HOST"|g" k8s/production/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_PASS_|"$PROD_DB_PASS"|g" k8s/production/secret.yaml
-    - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_NAME_|"synapse_prod_2"|g" k8s/production/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_NAME_|"$PROD_DB_NAME"|g" k8s/production/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_DB_USER_|"$PROD_DB_USER"|g" k8s/production/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_PROD_SIGNING_KEY_|"$PROD_SIGNING_KEY"|g" k8s/production/secret.yaml
 
@@ -126,8 +126,8 @@ provision-db-production:
     - gcloud container clusters get-credentials papers-cluster-production
     - export STOLON_PROXY=$(kubectl get pods --all-namespaces | grep stolon-proxy | awk 'NR==1{print $2}')
   script:
-    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE DATABASE synapse_prod_2\""  || true
-    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE USER synapse_prod_2 WITH ENCRYPTED PASSWORD '$PROD_DB_PASS'\"" || true
-    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE synapse_prod_2 to synapse_prod_2\"" || true
+    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE DATABASE $PROD_DB_NAME\""  || true
+    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"CREATE USER $PROD_DB_USER WITH ENCRYPTED PASSWORD '$PROD_DB_PASS'\"" || true
+    - kubectl exec $STOLON_PROXY -- bash -c "export PGPASSWORD=$PG_PROD_MASTER_PASSWORD && psql --host=localhost --username=$PG_PROD_MASTER_USERNAME postgres -c \"GRANT ALL PRIVILEGES ON DATABASE $PROD_DB_NAME to $PROD_DB_USER\"" || true
   tags:
     - docker

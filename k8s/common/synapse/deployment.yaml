@@ -27,13 +27,5 @@ spec:
                 name: synapse-secret
           ports:
             - containerPort: 8008
-          volumeMounts:
-            - mountPath: "/data"
-              name: synapse-pv
-              subPath: "data"
       restartPolicy: Always
-      volumes:
-        - name: synapse-pv
-          persistentVolumeClaim:
-            claimName: synapse-pvc
 status: {}

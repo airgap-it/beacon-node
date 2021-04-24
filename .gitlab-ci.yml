@@ -79,7 +79,7 @@ k8s-deploy-development:
     - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_PASS_|"$DEV_DB_PASS"|g" k8s/development/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_NAME_|"$DEV_DB_NAME"|g" k8s/development/secret.yaml
     - sed -i "s|_TO_BE_REPLACED_BY_DEV_DB_USER_|"$DEV_DB_USER"|g" k8s/development/secret.yaml
-    - sed -i'' -e "s|_TO_BE_REPLACED_BY_DEV_SIGNING_KEY_|$DEV_SIGNING_KEY|g" k8s/development/secret.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_DEV_SIGNING_KEY_|$DEV_SIGNING_KEY|g" k8s/development/secret.yaml
 
     - kubectl apply -f ./k8s/common/namespace.yaml
     - kubectl apply -f ./k8s/common/ --recursive

@@ -9,16 +9,9 @@ metadata:
 spec:
   tls:
     - hosts:
-        - matrix.papers.tech
         - matrix.prod.gke.papers.tech
       secretName: matrix-synapse-prod-tls
   rules:
-    - host: matrix.papers.tech
-      http:
-        paths:
-          - backend:
-              serviceName: synapse-service
-              servicePort: 8008
     - host: matrix.prod.gke.papers.tech
       http:
         paths:

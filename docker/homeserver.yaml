@@ -2,13 +2,9 @@ server_name: "{{SERVER_NAME}}"
 pid_file: /data/homeserver.pid
 
 ## Federation ## 
-federation_domain_whitelist:
-  - matrix-dev.papers.tech
-  - matrix.papers.tech
-  - matrix.tez.ie
-  - matrix.stove-labs.com
-  - yadayada.cryptonomic-infra.tech
-  - beacon.tztip.me
+# federation_domain_whitelist:
+#   - matrix.papers.tech
+#   - beacon.tztip.me
 
 federation_ip_range_blacklist:
   - '127.0.0.0/8'

@@ -17,6 +17,8 @@ COPY synapse_worker@.service /etc/systemd/system/
 COPY matrix_synapse.target /etc/systemd/system/
 COPY workers /config/workers
 
+COPY . /config
+
 # RUN touch /config/worker1.pid
 
 

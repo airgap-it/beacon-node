@@ -8,7 +8,7 @@ sed -i "s/{{SIGNING_KEY}}/$SIGNING_KEY/g" /config/signing.key
 
 /usr/local/bin/wait-for.sh $DB_HOST:5432
 
-synctl start /config/homeserver.yaml 
+# synctl start /config/homeserver.yaml 
 synctl start /config/homeserver.yaml -a /config/workers/
 # systemctl daemon-reload
 # systemctl start matrix-synapse.service

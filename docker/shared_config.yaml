@@ -1,4 +1,5 @@
 pid_file: /data/homeserver.pid
+server_name: "{{SERVER_NAME}}"
 
 listeners:
   - port: 8008

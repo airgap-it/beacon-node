@@ -28,7 +28,6 @@ publish_test:
     - docker push $DOCKERHUB_TAG_TEST 
   tags:
     - docker
-  when: manual
   
 
 publish:

@@ -11,8 +11,8 @@ NotifyAccess=main
 User=matrix-synapse
 WorkingDirectory=/var/lib/matrix-synapse
 EnvironmentFile=/etc/default/matrix-synapse
-ExecStartPre=/opt/venvs/matrix-synapse/bin/python -m synapse.app.homeserver --config-path=/etc/matrix-synapse/homeserver.yaml --config-path=/etc/matrix-synapse/conf.d/ --generate-keys
-ExecStart=/opt/venvs/matrix-synapse/bin/python -m synapse.app.homeserver --config-path=/etc/matrix-synapse/homeserver.yaml --config-path=/etc/matrix-synapse/conf.d/
+# ExecStartPre=/opt/venvs/matrix-synapse/bin/python -m synapse.app.homeserver --config-path=/config/homeserver.yaml --generate-keys
+ExecStart=/opt/venvs/matrix-synapse/bin/python -m synapse.app.homeserver --config-path=/config/homeserver.yaml
 ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 RestartSec=3

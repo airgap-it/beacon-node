@@ -14,3 +14,4 @@ worker_listeners:
        - federation
 
 worker_log_config: /home/matrix/synapse/config/worker1_log_config.yaml
+worker_pid_file: /home/matrix/synapse/worker1.pid

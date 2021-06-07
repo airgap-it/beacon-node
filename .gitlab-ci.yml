@@ -25,7 +25,8 @@ publish_test:
     - docker login -u "$DOCKERHUB_USER" -p "$DOCKERHUB_PASSWORD"
   script:
     - docker tag $DOCKERHUB_TAG $DOCKERHUB_TAG_TEST
-    - docker push $DOCKERHUB_TAG_TEST $DOCKERHUB_TAG
+    - docker push $DOCKERHUB_TAG_TEST 
+    - docker push $DOCKERHUB_TAG
   tags:
     - docker
   when: manual

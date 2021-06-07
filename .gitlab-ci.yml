@@ -26,7 +26,6 @@ publish_test:
   script:
     - docker tag $DOCKERHUB_TAG $DOCKERHUB_TAG_TEST
     - docker push $DOCKERHUB_TAG_TEST 
-    - docker push $DOCKERHUB_TAG
   tags:
     - docker
   when: manual

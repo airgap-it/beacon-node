@@ -24,8 +24,8 @@ COPY workers /config/workers
 
 COPY wait-for.sh /usr/local/bin/
 # COPY template_entrypoint.sh /usr/local/bin/
-COPY system_d_entrypoint.sh /usr/local/bin/
+COPY synctl.sh /usr/local/bin/
 
 
-ENTRYPOINT ["/usr/local/bin/system_d_entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/synctl_entrypoint.sh"]
 # ENTRYPOINT ["/usr/local/bin/template_entrypoint.sh"]

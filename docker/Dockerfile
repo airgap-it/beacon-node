@@ -1,7 +1,8 @@
 FROM matrixdotorg/synapse:v1.35.1
 LABEL maintainer="AirGap Team <hi@airgap.it>"
 
-RUN apk add libsodium-dev gcc
+# RUN apk add libsodium-dev gcc
+RUN apt-get update && apt-get install -y libsodium-dev gcc
 
 RUN pip install psycopg2 pysodium
 

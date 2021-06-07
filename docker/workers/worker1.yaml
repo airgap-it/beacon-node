@@ -13,4 +13,4 @@ worker_listeners:
        - client
        - federation
 
-worker_pid_file: /home/matrix/synapse/worker1.pid
+worker_pid_file: /config/worker1.pid

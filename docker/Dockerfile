@@ -17,6 +17,9 @@ COPY synapse_worker@.service /etc/systemd/system/
 COPY matrix_synapse.target /etc/systemd/system/
 COPY workers /config/workers
 
+RUN touch /config/worker1.pid
+
+
 # RUN systemctl daemon-reload
 
 COPY wait-for.sh /usr/local/bin/

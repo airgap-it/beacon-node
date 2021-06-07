@@ -8,6 +8,7 @@ sed -i "s/{{SIGNING_KEY}}/$SIGNING_KEY/g" /config/signing.key
 
 /usr/local/bin/wait-for.sh $DB_HOST:5432
 
+systemctl daemon-reload
 systemctl start matrix-synapse.service
 systemctl enable matrix-synapse-worker@woker1.service
 systemctl enable matrix-synapse-worker@woker2.service

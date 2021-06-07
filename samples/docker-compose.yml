@@ -11,7 +11,7 @@ services:
       - ./postgres_data:/var/lib/postgresql/data
   redis:
     image: redis:6.2.4-buster
-    
+    expose: "6379"
     
   tezos-synapse:
     image: airgapdocker/beacon-node:latest

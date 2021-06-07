@@ -17,3 +17,5 @@ listeners:
 
 redis:
   enabled: true
+
+report_stats: false

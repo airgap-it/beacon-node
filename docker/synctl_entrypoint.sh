@@ -1,5 +1,6 @@
 #!/bin/sh
 sed -i "s/{{SERVER_NAME}}/$SERVER_NAME/g" /config/homeserver.yaml
+sed -i "s/{{SERVER_NAME}}/$SERVER_NAME/g" /config/shared_config.yaml
 sed -i "s/{{DB_HOST}}/$DB_HOST/g" /config/homeserver.yaml
 sed -i "s/{{DB_USER}}/$DB_USER/g" /config/homeserver.yaml
 sed -i "s/{{DB_PASS}}/$DB_PASS/g" /config/homeserver.yaml

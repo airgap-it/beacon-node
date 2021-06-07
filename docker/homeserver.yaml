@@ -121,4 +121,5 @@ dynamic_thumbnails: false
 url_preview_enabled: false
 
 redis:
-    enabled: true
+  enabled: true
+  host: redis

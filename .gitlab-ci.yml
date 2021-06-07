@@ -1,6 +1,7 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   DOCKERHUB_TAG: airgapdocker/beacon-node:$CI_COMMIT_SHA
+  DOCKERHUB_TAG_TEST: airgapdocker/beacon-node:test
   DOCKERHUB_TAG_LATEST: airgapdocker/beacon-node:latest
 image: tmaier/docker-compose:latest
 
@@ -16,6 +17,19 @@ build:
     - docker build -t $DOCKERHUB_TAG ./docker/
   tags:
     - docker
+
+publish_test:
+  stage: publish
+  image: google/cloud-sdk
+  before_script:
+    - docker login -u "$DOCKERHUB_USER" -p "$DOCKERHUB_PASSWORD"
+  script:
+    - docker tag $DOCKERHUB_TAG $DOCKERHUB_TAG_TEST
+    - docker push $DOCKERHUB_TAG_TEST $DOCKERHUB_TAG
+  tags:
+    - docker
+  when: manual
+  
 
 publish:
   stage: publish

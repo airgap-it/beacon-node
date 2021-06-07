@@ -12,6 +12,7 @@ services:
   redis:
     image: redis:6.2.4-buster
     
+    
   tezos-synapse:
     image: airgapdocker/beacon-node:latest
     depends_on:

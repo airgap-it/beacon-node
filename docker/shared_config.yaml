@@ -1,3 +1,4 @@
+pid_file: /data/homeserver.pid
 
 listeners:
   - port: 8008

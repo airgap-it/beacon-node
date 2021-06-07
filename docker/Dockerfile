@@ -1,4 +1,4 @@
-FROM matrixdotorg/synapse:v1.5.0-py3
+FROM matrixdotorg/synapse:v1.35.1
 LABEL maintainer="AirGap Team <hi@airgap.it>"
 
 RUN apk add libsodium-dev gcc

@@ -25,6 +25,12 @@ listeners:
     x_forwarded: true
     resources:
       - names: [client, federation]
+  # The HTTP replication port
+  - port: 9093
+    bind_address: '127.0.0.1'
+    type: http
+    resources:
+     - names: [replication]
 
 #tls_certificate_path: "/data/{{SERVER_NAME}}.tls.crt"
 #tls_private_key_path: "/data/{{SERVER_NAME}}.tls.key"
@@ -113,3 +119,6 @@ max_upload_size: "0"
 max_image_pixels: "0"
 dynamic_thumbnails: false
 url_preview_enabled: false
+
+redis:
+    enabled: true

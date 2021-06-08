@@ -14,7 +14,9 @@ sed -i "s/{{SIGNING_KEY}}/$SIGNING_KEY/g" /config/signing.key
 # synctl start /config/shared_config.yaml -w /config/workers/worker2.yaml
 synctl start /config/homeserver.yaml -w /config/workers/main_process.yaml
 synctl start /config/homeserver.yaml -w /config/workers/worker1.yaml
-synctl start /config/homeserver.yaml -w /config/workers/worker2.yaml --no-daemonize
+synctl start /config/homeserver.yaml -w /config/workers/worker2.yaml
+synctl start /config/homeserver.yaml -w /config/workers/worker3.yaml
+synctl start /config/homeserver.yaml -w /config/workers/worker4.yaml --no-daemonize
 # systemctl daemon-reload
 # systemctl start matrix-synapse.service
 # systemctl enable matrix-synapse-worker@woker1.service

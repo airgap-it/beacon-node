@@ -9,7 +9,6 @@ RUN pip install psycopg2 pysodium
 RUN mkdir -p /keys
 
 COPY crypto_auth_provider.py /usr/local/lib/python3.8/site-packages/
-COPY shared_secret_auth.py /usr/local/lib/python3.8/site-packages/
 COPY homeserver.yaml /config/
 COPY synapse.log.config /config/
 COPY signing.key /config/

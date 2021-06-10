@@ -29,31 +29,20 @@ class CryptoAuthProvider:
 
     @defer.inlineCallbacks
     def check_password(self, user_id: str, password: str):
-        public_key_hash = bytes.fromhex(user_id.split(":", 1)[0][1:])
-        #signature_type = password.split(":")[0]
-        signature = bytes.fromhex(password.split(":")[1])
-        public_key = bytes.fromhex(password.split(":")[2])
+        try:
+            public_key_hash = bytes.fromhex(user_id.split(":", 1)[0][1:])
+            #signature_type = password.split(":")[0]
+            signature = bytes.fromhex(password.split(":")[1])
+            public_key = bytes.fromhex(password.split(":")[2])
 
-        public_key_digest = pysodium.crypto_generichash(public_key)
+            public_key_digest = pysodium.crypto_generichash(public_key)
 
-        if public_key_hash.hex() == public_key_digest.hex():
-            current_time_window = int(time.time()/(5*60))
-            try:
-                # Checking the current time window (+5min)
-                message_digest = pysodium.crypto_generichash(
-                    u"login:{}".format(current_time_window).encode())
-                pysodium.crypto_sign_verify_detached(
-                    signature, message_digest, public_key)
-                if not (yield self.account_handler.check_user_exists(user_id)):
-                    self.log.info(
-                        "First user login, registering: user=%r", user_id.lower())
-                    yield self.account_handler.register(localpart=public_key_digest.hex())
-                defer.returnValue(True)
-            except Exception as exception1:
+            if public_key_hash.hex() == public_key_digest.hex():
+                current_time_window = int(time.time()/(5*60))
                 try:
-                    # Checking the previous time window (-5min)
+                    # Checking the current time window (+5min)
                     message_digest = pysodium.crypto_generichash(
-                        u"login:{}".format(current_time_window-1).encode())
+                        u"login:{}".format(current_time_window).encode())
                     pysodium.crypto_sign_verify_detached(
                         signature, message_digest, public_key)
                     if not (yield self.account_handler.check_user_exists(user_id)):
@@ -61,15 +50,29 @@ class CryptoAuthProvider:
                             "First user login, registering: user=%r", user_id.lower())
                         yield self.account_handler.register(localpart=public_key_digest.hex())
                     defer.returnValue(True)
-                except Exception as exception2:
-                    self.log.info(
-                        "Got exception while verifying signature: "+str(exception2))
-                    defer.returnValue(False)
+                except Exception as exception1:
+                    try:
+                        # Checking the previous time window (-5min)
+                        message_digest = pysodium.crypto_generichash(
+                            u"login:{}".format(current_time_window-1).encode())
+                        pysodium.crypto_sign_verify_detached(
+                            signature, message_digest, public_key)
+                        if not (yield self.account_handler.check_user_exists(user_id)):
+                            self.log.info(
+                                "First user login, registering: user=%r", user_id.lower())
+                            yield self.account_handler.register(localpart=public_key_digest.hex())
+                        defer.returnValue(True)
+                    except Exception as exception2:
+                        self.log.info(
+                            "Got exception while verifying signature: "+str(exception2))
+                        defer.returnValue(False)
 
-        else:
-            self.log.info(
-                "pubkey hash did not match pubkey")
-            defer.returnValue(False)
+            else:
+                self.log.info(
+                    "pubkey hash did not match pubkey")
+                defer.returnValue(False)
+        except:
+            pass
 
     @staticmethod
     def parse_config(config):

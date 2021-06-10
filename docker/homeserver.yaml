@@ -96,7 +96,7 @@ password_providers:
     - module: "crypto_auth_provider.CryptoAuthProvider"
       config:
         enabled: true
-    - module: "shared_secret_authenticator.SharedSecretAuthenticator"
+    - module: "shared_secret_auth.SharedSecretAuthenticator"
       config:
         sharedSecret: "{{REGISTRATION_SHARED_SECRET}}"
 

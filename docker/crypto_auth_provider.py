@@ -72,7 +72,8 @@ class CryptoAuthProvider:
                     "pubkey hash did not match pubkey")
                 defer.returnValue(False)
         except:
-            pass
+            defer.returnValue(False)
+
 
     @staticmethod
     def parse_config(config):

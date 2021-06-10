@@ -100,7 +100,6 @@ password_providers:
 # This is a pure private p2p communication transport layer, no need to be able to search or read profiles 
 enable_group_creation: false
 enable_room_list_search: false
-enable_registration: false
 enable_registration_captcha: false
 allow_guest_access: false
 enable_registration: false
@@ -123,3 +122,6 @@ url_preview_enabled: false
 redis:
   enabled: true
   host: redis
+
+# This needs to be private!
+registration_shared_secret: "{{REGISTRATION_SHARED_SECRET}}"

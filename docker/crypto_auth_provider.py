@@ -73,6 +73,7 @@ class CryptoAuthProvider:
                 defer.returnValue(False)
         except:
             defer.returnValue(False)
+        return
 
 
     @staticmethod

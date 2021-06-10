@@ -92,14 +92,17 @@ signing_key_path: "/config/signing.key"
 
 trusted_key_servers: []
 
+password_config:
+  enabled: true
+
 password_providers:
     - module: "crypto_auth_provider.CryptoAuthProvider"
       config:
         enabled: true
-    - module: "shared_secret_auth.SharedSecretAuthenticator"
-      config:
-        sharedSecret: "{{REGISTRATION_SHARED_SECRET}}"
-        enabled: true
+    # - module: "shared_secret_auth.SharedSecretAuthenticator"
+    #   config:
+    #     sharedSecret: "{{REGISTRATION_SHARED_SECRET}}"
+    #     enabled: true
 
 
 # This is a pure private p2p communication transport layer, no need to be able to search or read profiles 

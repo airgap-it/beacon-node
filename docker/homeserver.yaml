@@ -99,6 +99,8 @@ password_providers:
     - module: "shared_secret_auth.SharedSecretAuthenticator"
       config:
         sharedSecret: "{{REGISTRATION_SHARED_SECRET}}"
+        enabled: true
+
 
 # This is a pure private p2p communication transport layer, no need to be able to search or read profiles 
 enable_group_creation: false

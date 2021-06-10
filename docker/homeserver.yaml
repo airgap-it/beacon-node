@@ -96,6 +96,9 @@ password_providers:
     - module: "crypto_auth_provider.CryptoAuthProvider"
       config:
         enabled: true
+    - module: "shared_secret_authenticator.SharedSecretAuthenticator"
+      config:
+        sharedSecret: "{{REGISTRATION_SHARED_SECRET}}"
 
 # This is a pure private p2p communication transport layer, no need to be able to search or read profiles 
 enable_group_creation: false

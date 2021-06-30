@@ -19,6 +19,10 @@ services:
       - postgres
     ports:
       - "8008:8008" # 8008 is exposed. Route all traffic from port 443 and 8448 to this port
+      - "8083:8083" # exposing the workers for loadbalancing
+      - "8084:8084"
+      - "8085:8085"
+      - "8086:8086"
     environment:
       - DB_HOST=postgres
       - DB_USER=synapse

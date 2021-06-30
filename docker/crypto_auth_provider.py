@@ -25,17 +25,20 @@ class CryptoAuthProvider:
     def __init__(self, config, account_handler):
         self.account_handler = account_handler
         self.config = config
-        self.hs_hostname = self.account_handler.hs.hostname
         self.log = logging.getLogger(__name__)
 
     @defer.inlineCallbacks
     def check_password(self, user_id: str, password: str):
-        public_key_hash = bytes.fromhex(user_id.split(":", 1)[0][1:])
-        #signature_type = password.split(":")[0]
-        signature = bytes.fromhex(password.split(":")[1])
-        public_key = bytes.fromhex(password.split(":")[2])
+        try:
+            public_key_hash = bytes.fromhex(user_id.split(":", 1)[0][1:])
+            #signature_type = password.split(":")[0]
+            signature = bytes.fromhex(password.split(":")[1])
+            public_key = bytes.fromhex(password.split(":")[2])
 
-        public_key_digest = pysodium.crypto_generichash(public_key)
+            public_key_digest = pysodium.crypto_generichash(public_key)
+        except:
+            defer.returnValue(False)
+            return
 
         if public_key_hash.hex() == public_key_digest.hex():
             current_time_window = int(time.time()/(5*60))
@@ -66,7 +69,6 @@ class CryptoAuthProvider:
                     self.log.info(
                         "Got exception while verifying signature: "+str(exception2))
                     defer.returnValue(False)
-
         else:
             self.log.info(
                 "pubkey hash did not match pubkey")

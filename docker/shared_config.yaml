@@ -1,0 +1,22 @@
+pid_file: /data/homeserver.pid
+server_name: "{{SERVER_NAME}}"
+
+listeners:
+  - port: 8008
+    type: http
+    tls: false # see https://github.com/matrix-org/synapse/issues/5872
+    x_forwarded: true
+    resources:
+      - names: [client, federation]
+  # The HTTP replication port
+  - port: 9093
+    bind_address: '127.0.0.1'
+    type: http
+    resources:
+     - names: [replication]
+
+redis:
+  enabled: true
+  host: redis
+
+report_stats: false

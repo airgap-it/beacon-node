@@ -65,11 +65,44 @@ docker-compose up -d
 This is a sample configuration of `nginx` that will route all the traffic to the correct port. The certificates were added by Certbot and provided by letsencrypt.
 
 ```nginx
+
+upstream matrix_workers {
+        server localhost:8083;
+        server localhost:8084;
+        server localhost:8085;
+        server localhost:8086;
+    }
+
 server {
     listen 8448 ssl;
     listen [::]:8448 ssl;
 
     server_name MY_SERVER_DOMAIN;
+    
+    location ~* ^(\/_matrix\/client\/(v2_alpha|r0)\/sync) {
+         proxy_set_header Host $host;
+         proxy_set_header   X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;                 
+        proxy_pass         http://matrix_workers;           
+         client_max_body_size 50M;
+    }
+ 
+    location ~* ^(\/_matrix\/client\/(api/v1|r0|unstable)\/rooms\/.*\/(join|invite|leave|ban|unban|kick)) {
+        proxy_set_header Host $host;
+        proxy_set_header   X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;                 
+        proxy_pass         http://matrix_workers;           
+        client_max_body_size 50M;
+    }
+ 
+ 
+   location ~* ^(\/_matrix\/client\/(api/v1|r0|unstable)\/login) {
+        proxy_set_header Host $host;
+        proxy_set_header   X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;                 
+        proxy_pass         http://matrix_workers;           
+        client_max_body_size 50M;
+    }
 
     location / {
         proxy_set_header   X-Forwarded-For $remote_addr;

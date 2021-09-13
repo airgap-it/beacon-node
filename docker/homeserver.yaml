@@ -32,6 +32,14 @@ listeners:
     resources:
      - names: [replication]
 
+# https://github.com/matrix-org/synapse/blob/master/docs/message_retention_policies.md
+# https://github.com/matrix-org/synapse/blob/v1.36.0/docs/sample_config.yaml#L451-L518
+retention:
+  enabled: true
+  default_policy:
+     max_lifetime: 60d
+  allowed_lifetime_max: 60d
+
 #tls_certificate_path: "/data/{{SERVER_NAME}}.tls.crt"
 #tls_private_key_path: "/data/{{SERVER_NAME}}.tls.key"
 

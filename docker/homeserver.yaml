@@ -37,8 +37,8 @@ listeners:
 retention:
   enabled: true
   default_policy:
-     max_lifetime: 60d
-  allowed_lifetime_max: 60d
+     max_lifetime: 1d
+  allowed_lifetime_max: 1d
 
 #tls_certificate_path: "/data/{{SERVER_NAME}}.tls.crt"
 #tls_private_key_path: "/data/{{SERVER_NAME}}.tls.key"

@@ -19,6 +19,10 @@ COPY workers /config/workers
 
 COPY shared_config.yaml /config/
 
+# run change on max size
+# /usr/local/lib/python3.8/site-packages/synapse
+RUN sed -i 's/65536/1048576/' /usr/local/lib/python3.8/site-packages/synapse/api/constants.py
+
 # RUN touch /config/worker1.pid
 
 

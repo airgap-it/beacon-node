@@ -26,9 +26,9 @@ publish:
     - docker tag $DOCKERHUB_TAG $DOCKERHUB_TAG_LATEST
     - docker push $DOCKERHUB_TAG
     - docker push $DOCKERHUB_TAG_LATEST
-  only:
-    - master
-    - development
+  # only:
+  #   - master
+  #   - development
   tags:
     - docker
 

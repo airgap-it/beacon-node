@@ -24,6 +24,7 @@ build:
     - docker login -u "$DOCKERHUB_USER" -p "$DOCKERHUB_PASSWORD"
   script:
     - docker tag $DOCKERHUB_TAG $SECOND_TAG
+    - echo $SECOND_TAG
     # - docker push $DOCKERHUB_TAG
     # - docker push $SECOND_TAG
 
@@ -38,7 +39,7 @@ publish:
 publish-tag:
   extends: .publish-base
   variables:
-      SECOND_TAG: $CI_COMMIT_TAG
+      SECOND_TAG: airgapdocker/beacon-node:$CI_COMMIT_TAG
   only:
     - tags
 

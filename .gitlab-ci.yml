@@ -1,5 +1,5 @@
 include:
-  - project: 'papers/internal'
+  - project: 'papers/papers-internal/internal'
     file: '/.base-gitlab-ci.yml'
 
 variables:

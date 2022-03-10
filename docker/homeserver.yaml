@@ -140,4 +140,4 @@ redis:
 registration_shared_secret: "{{REGISTRATION_SHARED_SECRET}}"
 
 sentry:
-  dsn: {{SENTRY_DSN}}
+  dsn: "{{SENTRY_DSN}}"

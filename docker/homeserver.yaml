@@ -66,7 +66,6 @@ database:
 
 log_config: "/config/synapse.log.config"
 
-
 ## Ratelimiting
 rc_message:
   per_second: 15
@@ -91,8 +90,6 @@ rc_federation:
   concurrent: 3
 
 bcrypt_rounds: 12
-
-allow_guest_access: false
 
 report_stats: false
 
@@ -141,3 +138,6 @@ redis:
 
 # This needs to be private!
 registration_shared_secret: "{{REGISTRATION_SHARED_SECRET}}"
+
+sentry:
+  dsn: {{SENTRY_DSN}}

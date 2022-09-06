@@ -4,9 +4,16 @@ services:
   postgres:
     image: postgres:12.0
     environment:
-      - POSTGRES_USER=synapse
-      - POSTGRES_PASSWORD=synapsepassword
-      - POSTGRES_DB=synapse
+      POSTGRES_USER: synapse
+      POSTGRES_PASSWORD: synapsepassword
+      POSTGRES_DB: synapse
+      LANG: 'C'
+      LANGUAGE: 'C'
+      LC_ALL: 'C'
+      LC_COLLATE: 'C'
+      LC_CTYPE: 'C'
+      ENCODING: "UTF8"
+      POSTGRES_INITDB_ARGS: "-E UTF8"
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
   redis:
@@ -24,10 +31,13 @@ services:
       - "8085:8085"
       - "8086:8086"
     environment:
-      - DB_HOST=postgres
-      - DB_USER=synapse
-      - DB_PASS=synapsepassword
-      - DB_NAME=synapse
-      - SERVER_NAME=matrix.papers.tech
+      DB_HOST: postgres
+      DB_USER: synapse
+      DB_PASS: synapsepassword
+      DB_NAME: synapse
+      SERVER_NAME: matrix.papers.tech
+      SIGNING_KEY: "dummy signing key"
+      SERVER_REGION: EU
+
     volumes:
       - ./data/synapse-config:/data

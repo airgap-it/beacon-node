@@ -16,6 +16,7 @@ class BeaconInfoModule(Resource):
 
     def render(self, request):
         request.setHeader(b"content-type", b"application/json; charset=utf-8")
+        request.setHeader(b"Access-Control-Allow-Origin",b"*")
         return json.dumps({
             "region":os.environ.get("SERVER_REGION", "region not set"),
             "known_servers":self.config.get("known_servers",[]),

@@ -36,8 +36,8 @@ services:
       DB_PASS: synapsepassword
       DB_NAME: synapse
       SERVER_NAME: matrix.papers.tech
-      SIGNING_KEY: "dummy signing key"
-      SERVER_REGION: EU
+      SIGNING_KEY: "dummy signing key" # sudo docker run -it --rm -v local_path:/data -e SYNAPSE_SERVER_NAME=matrix.papers.tech -e SYNAPSE_REPORT_STATS=no matrixdotorg/synapse:latest generate
+      SERVER_REGION: EU-1
 
     volumes:
       - ./data/synapse-config:/data

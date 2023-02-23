@@ -31,6 +31,19 @@ Note: in order for federation to work you will need:
 2. have that SSL/TLS setup for port 8448 and 443
 3. forward SSL/TLS traffic from 8448 to 8008 of this container
 4. forward SSL/TLS traffic from 443 to 8008 of this container
+5. forward traffic for some routes to the ports 8083-8086 (see samples/nginx.conf)
+
+# Creating & setting a SIGNING_KEY
+You can generate a signing key with:
+`sudo docker run -it --rm -v ./data:/data -e SYNAPSE_SERVER_NAME=SERVER_NAME -e SYNAPSE_REPORT_STATS=no matrixdotorg/synapse:latest generate`
+The signinkey is then in the `data` folder, it's full content should be set within doublequotes as the SIGNING_KEY in the docker-compose file
+
+eg. 
+```yaml
+ ...
+ SIGNING_KEY: "ed25519 ** ***"
+ ...
+```
 
 ## Running beacon-node using docker
 

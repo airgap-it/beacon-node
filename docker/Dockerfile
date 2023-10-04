@@ -1,4 +1,4 @@
-FROM matrixdotorg/synapse:v1.37.0
+FROM matrixdotorg/synapse:v1.93.0
 LABEL maintainer="AirGap Team <hi@airgap.it>"
 
 # RUN apk add libsodium-dev gcc
@@ -20,7 +20,7 @@ COPY shared_config.yaml /config/
 COPY beacon_info_module.py /usr/local/lib/python3.8/site-packages/
 
 # run change on max size
-RUN sed -i 's/65536/1048576/' /usr/local/lib/python3.8/site-packages/synapse/api/constants.py
+RUN sed -i 's/65536/1048576/' /usr/local/lib/python3.11/site-packages/synapse/api/constants.py
 
 COPY wait-for.sh /usr/local/bin/
 COPY synctl_entrypoint.sh /usr/local/bin/

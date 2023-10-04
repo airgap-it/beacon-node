@@ -13,10 +13,32 @@ listeners:
     bind_address: '127.0.0.1'
     type: http
     resources:
-     - names: [replication]
+      - names: [replication]
 
 redis:
   enabled: true
   host: redis
 
 report_stats: false
+
+instance_map:
+  main:
+    host: localhost
+    port: 9093
+    tls: false
+  worker1:
+    host: localhost
+    port: 8083
+    tls: false
+  worker2:
+    host: localhost
+    port: 8084
+    tls: false
+  worker3:
+    host: localhost
+    port: 8085
+    tls: false
+  worker4:
+    host: localhost
+    port: 8086
+    tls: false

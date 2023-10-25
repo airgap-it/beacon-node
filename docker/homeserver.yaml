@@ -154,7 +154,10 @@ modules:
         - "beacon-node-1.hope-3.papers.tech"
         - "beacon-node-1.hope-4.papers.tech"
         - "beacon-node-1.hope-5.papers.tech"
-
+        - "beacon-node-1.beacon-server-1.papers.tech"
+        - "beacon-node-1.beacon-server-2.papers.tech"
+        - "beacon-node-1.beacon-server-3.papers.tech"
+        - "beacon-node-1.beacon-server-4.papers.tech"
 
 instance_map:
   main:

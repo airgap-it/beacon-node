@@ -154,4 +154,29 @@ modules:
         - "beacon-node-1.hope-3.papers.tech"
         - "beacon-node-1.hope-4.papers.tech"
         - "beacon-node-1.hope-5.papers.tech"
-      
+        - "beacon-node-1.beacon-server-1.papers.tech"
+        - "beacon-node-1.beacon-server-2.papers.tech"
+        - "beacon-node-1.beacon-server-3.papers.tech"
+        - "beacon-node-1.beacon-server-4.papers.tech"
+
+instance_map:
+  main:
+    host: localhost
+    port: 9093
+    tls: false
+  worker1:
+    host: localhost
+    port: 8083
+    tls: false
+  worker2:
+    host: localhost
+    port: 8084
+    tls: false
+  worker3:
+    host: localhost
+    port: 8085
+    tls: false
+  worker4:
+    host: localhost
+    port: 8086
+    tls: false

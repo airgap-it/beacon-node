@@ -61,15 +61,15 @@ database:
     password: {{DB_PASS}}
     database: {{DB_NAME}}
     host: {{DB_HOST}}
-    cp_min: 5
-    cp_max: 20
+    cp_min: 20
+    cp_max: 80
 
 log_config: "/config/synapse.log.config"
 
 ## Ratelimiting
 rc_message:
-  per_second: 15
-  burst_count: 100
+  per_second: 100
+  burst_count: 1000
 
 rc_login:
   address:
@@ -87,7 +87,7 @@ rc_federation:
   sleep_limit: 50
   sleep_delay: 250
   reject_limit: 50
-  concurrent: 3
+  concurrent: 10
 
 bcrypt_rounds: 12
 
@@ -135,6 +135,15 @@ url_preview_enabled: false
 redis:
   enabled: true
   host: redis
+
+## Caching - Performance optimizations
+caches:
+  global_factor: 2.0
+  per_cache_factors:
+    get_users_in_room: 5.0
+    get_room_summary: 5.0
+    get_event: 3.0
+event_cache_size: 100K
 
 # This needs to be private!
 registration_shared_secret: "{{REGISTRATION_SHARED_SECRET}}"

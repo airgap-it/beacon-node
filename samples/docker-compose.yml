@@ -1,43 +1,83 @@
-version: "3.5"
-
+version: "3.1"
 services:
   postgres:
-    image: postgres:12.0
+    image: postgres:18
+    restart: always
+    shm_size: '2gb'
     environment:
       POSTGRES_USER: synapse
-      POSTGRES_PASSWORD: synapsepassword
+      POSTGRES_PASSWORD: "testpassword"
       POSTGRES_DB: synapse
       LANG: 'C'
       LANGUAGE: 'C'
       LC_ALL: 'C'
       LC_COLLATE: 'C'
       LC_CTYPE: 'C'
-      ENCODING: "UTF8"
+      ENCODING: "UTF8" 
       POSTGRES_INITDB_ARGS: "-E UTF8"
+    command: >
+      postgres
+      -c shared_buffers=1GB   
+      -c effective_cache_size=4GB 
+      -c work_mem=64MB           
+      -c maintenance_work_mem=512MB
+      -c max_connections=300      
+      -c random_page_cost=1.1    
+      -c checkpoint_completion_target=0.9 
+      -c autovacuum_vacuum_scale_factor=0.05 
+      -c min_wal_size=2GB               
+      -c max_wal_size=4GB              
+      -c wal_buffers=32MB             
+      -c autovacuum_max_workers=4    
+      -c autovacuum_analyze_scale_factor=0.02 
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   redis:
     image: redis:6.2.4-buster
+    restart: always
+    command: >
+      redis-server 
+      --maxmemory 1gb      
+      --maxmemory-policy allkeys-lru  
     expose: 
       - "6379"
-  tezos-synapse:
-    image: beacon-node
-    depends_on:
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  tezos-synapse: 
+    # image: airgapdocker/beacon-node:v1.0.6
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: tezos-matrix-newtest
+    depends_on: 
       - postgres
     ports:
-      - "8008:8008" # 8008 is exposed. Route all traffic from port 443 and 8448 to this port
-      - "8083:8083" # exposing the workers for loadbalancing
+      - "8008:8008" 
+      - "8083:8083"
       - "8084:8084"
       - "8085:8085"
       - "8086:8086"
     environment:
       DB_HOST: postgres
       DB_USER: synapse
-      DB_PASS: synapsepassword
+      DB_PASS: "testpassword"
       DB_NAME: synapse
-      SERVER_NAME: matrix.papers.tech
-      SIGNING_KEY: "dummy signing key"
-      SERVER_REGION: EU
-
+      SENTRY_DSN: "https://1961ffeacbfb4d3095584a92ecb1784a@sentry.papers.tech/197"
+      SERVER_NAME: localhost:8008
+      SIGNING_KEY: "ed25519 a_cOzl EQ6g4vfE0fqfCkKhoRWsQksfmn7oQakgBFJz/gWJfNY="
+      REGISTRATION_SHARED_SECRET: "testsecret"
+      SERVER_REGION: "north-america-east"
     volumes:
-      - ./data/synapse-config:/data
+      - ./synapse_data:/data
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"

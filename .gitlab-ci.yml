@@ -16,7 +16,8 @@ stages:
 build:
   stage: build
   script:
-    - docker build -t $DOCKERHUB_TAG ./docker/
+    - docker build -t $DOCKERHUB_TAG -f docker/Dockerfile .
+
 
 .publish-base:
   stage: publish

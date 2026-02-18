@@ -104,6 +104,13 @@ server {
         client_max_body_size 50M;
     }
 
+    # Federation discovery: tells remote servers to use port 443 instead of 8448.
+    # Required when behind Cloudflare or any CDN that blocks port 8448.
+    location /.well-known/matrix/server {
+        return 200 '{"m.server": "MY_SERVER_DOMAIN:443"}';
+        add_header Content-Type application/json;
+    }
+
     location / {
         proxy_set_header   X-Forwarded-For $remote_addr;
         proxy_set_header   Host $http_host;

@@ -1,7 +1,9 @@
 server_name: "{{SERVER_NAME}}"
+public_baseurl: "https://{{SERVER_NAME}}"
 pid_file: /data/homeserver.pid
+serve_server_wellknown: true
 
-## Federation ## 
+## Federation ##
 # federation_domain_whitelist:
 #   - matrix.papers.tech
 #   - beacon.tztip.me

@@ -1,0 +1,61 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "docker/**"
+      - ".github/workflows/security-scan.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "docker/**"
+      - ".github/workflows/security-scan.yml"
+  schedule:
+    - cron: "0 6 * * 1" # Weekly Monday 06:00 UTC
+
+env:
+  TEST_TAG: beacon-node:scan
+
+jobs:
+  trivy:
+    name: Trivy Image Scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./docker/
+          load: true
+          tags: ${{ env.TEST_TAG }}
+          cache-from: type=gha
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.TEST_TAG }}
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: "trivy-results.sarif"
+
+      - name: Trivy summary (table)
+        uses: aquasecurity/trivy-action@0.28.0
+        if: always()
+        with:
+          image-ref: ${{ env.TEST_TAG }}
+          format: "table"
+          severity: "CRITICAL,HIGH"

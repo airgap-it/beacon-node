@@ -1,7 +1,7 @@
 version: "3.1"
 services:
   postgres:
-    image: postgres:12.0
+    image: postgres:18.2
     restart: always
     # IMPORTANT: shm_size must be larger than shared_buffers to prevent Docker shared memory errors
     shm_size: '2gb'

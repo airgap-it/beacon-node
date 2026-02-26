@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: synapse-config-map
-  namespace: beacon-node
-data:
-  SERVER_NAME: "matrix.papers.tech"

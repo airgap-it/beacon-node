@@ -1,8 +1,6 @@
-version: "3.5"
-
 services:
   postgres:
-    image: postgres:18.2
+    image: postgres:16-bookworm
     environment:
       POSTGRES_USER: synapse
       POSTGRES_PASSWORD: synapsepassword
@@ -17,13 +15,14 @@ services:
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
   redis:
-    image: redis:6.2.6-buster
-    expose: 
+    image: redis:8-bookworm
+    expose:
       - "6379"
   tezos-synapse:
-    image: beacon-node
+    image: ghcr.io/apham0001/beacon-node:latest
     depends_on:
       - postgres
+      - redis
     ports:
       - "8008:8008" # 8008 is exposed. Route all traffic from port 443 and 8448 to this port
       - "8083:8083" # exposing the workers for loadbalancing
@@ -35,9 +34,12 @@ services:
       DB_USER: synapse
       DB_PASS: synapsepassword
       DB_NAME: synapse
-      SERVER_NAME: matrix.papers.tech
-      SIGNING_KEY: "dummy signing key"
+      SERVER_NAME: localhost
       SERVER_REGION: EU
-
+      # Generate a real signing key with:
+      #   docker run --rm --entrypoint="" ghcr.io/apham0001/beacon-node:latest \
+      #     python -m synapse.app.homeserver --generate-keys --config-path /dev/null 2>/dev/null && cat /config/signing.key
+      # Or use: python -c "import signedjson.key; import sys; key=signedjson.key.generate_signing_key('0'); signedjson.key.write_signing_keys(sys.stdout, [key])"
+      SIGNING_KEY: "ed25519 a_fake AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
     volumes:
       - ./data/synapse-config:/data

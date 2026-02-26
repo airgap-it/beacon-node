@@ -2,20 +2,14 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "forkProcessing": "enabled",
+  "automerge": true,
+  "automergeType": "pr",
   "packageRules": [
     {
-      "description": "Auto-merge minor/patch updates for GitHub Actions",
-      "matchManagers": ["github-actions"],
+      "description": "Auto-merge all updates (CI must pass via branch protection)",
+      "matchManagers": ["github-actions", "dockerfile"],
       "automerge": true,
       "automergeType": "pr"
-    },
-    {
-      "description": "Auto-merge patch updates for Synapse base image",
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["matrixdotorg/synapse"],
-      "automerge": true,
-      "automergeType": "pr",
-      "matchUpdateTypes": ["patch"]
     }
   ]
 }

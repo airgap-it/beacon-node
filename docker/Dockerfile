@@ -1,11 +1,11 @@
-FROM matrixdotorg/synapse:v1.148.0 AS builder
+FROM ghcr.io/element-hq/synapse:v1.148.0 AS builder
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends libsodium-dev gcc && \
     pip install --no-cache-dir psycopg2 pysodium && \
     rm -rf /var/lib/apt/lists/*
 
-FROM matrixdotorg/synapse:v1.148.0
+FROM ghcr.io/element-hq/synapse:v1.148.0
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends libsodium23 libpq5 && \

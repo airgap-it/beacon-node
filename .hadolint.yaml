@@ -1,0 +1,3 @@
+ignored:
+  - DL3008 # apt pin versions - managed by base image
+  - DL3013 # pip pin versions - managed by base image

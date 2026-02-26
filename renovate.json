@@ -10,6 +10,14 @@
       "matchManagers": ["github-actions", "dockerfile"],
       "automerge": true,
       "automergeType": "pr"
+    },
+    {
+      "description": "Auto-merge patch updates for Synapse base image",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/element-hq/synapse"],
+      "automerge": true,
+      "automergeType": "pr",
+      "matchUpdateTypes": ["patch"]
     }
   ]
 }

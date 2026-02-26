@@ -5,7 +5,7 @@ A custom [Synapse](https://github.com/element-hq/synapse) Docker image with cryp
 ## What's different from upstream Synapse
 
 - **Crypto auth provider** (`crypto_auth_provider.py`) — authentication via cryptographic signatures
-- **Beacon info module** (`beacon_info_module.py`) — exposes `/_synapse/client/beacon/info`
+- **Beacon info module** (`beacon_info_module.py`) — exposes `/_synapse/client/beacon/info` and `/.well-known/matrix/*` endpoints
 - **pysodium** and **psycopg2** pre-installed
 - **Worker mode** enabled by default (1 main process + 4 workers)
 - **Max event size** increased from 64KB to 1MB
@@ -31,6 +31,7 @@ docker compose up -d
 | `DB_NAME` | Yes | PostgreSQL database name |
 | `SIGNING_KEY` | Yes | Ed25519 signing key (see below) |
 | `SERVER_REGION` | Yes | Geographic region for beacon info |
+| `REDIS_HOST` | No | Redis hostname (default: `redis`) |
 
 ### Generating a signing key
 
@@ -38,6 +39,29 @@ docker compose up -d
 docker run --rm --entrypoint="" ghcr.io/apham0001/beacon-node:latest \
   python -c "import signedjson.key, sys; signedjson.key.write_signing_keys(sys.stdout, [signedjson.key.generate_signing_key('0')])"
 ```
+
+## Dependencies
+
+### PostgreSQL
+
+Required for all Synapse data (rooms, messages, events, users, keys). Synapse requires C locale and UTF8 encoding.
+
+The image expects the database to be reachable at `DB_HOST` on port 5432. The entrypoint waits for PG to be ready before starting Synapse.
+
+### Redis
+
+Required for inter-process communication between the main process and the 4 workers. Configurable via the `REDIS_HOST` env var (defaults to `redis` if not set).
+
+Redis does not require authentication (Synapse default).
+
+## Known servers
+
+The list of known beacon servers is hardcoded in `docker/homeserver.yaml` and served via the `/_synapse/client/beacon/info` endpoint. Clients use this list for server discovery and failover.
+
+Current servers:
+- `beacon-node-1.octez.io` through `beacon-node-8.octez.io`
+
+To update the list, edit `docker/homeserver.yaml` under `modules > beacon_info_module > config > known_servers` and rebuild the image.
 
 ## Ports
 
@@ -50,6 +74,14 @@ docker run --rm --entrypoint="" ghcr.io/apham0001/beacon-node:latest \
 | 8086 | Worker 4 |
 
 Route all external traffic (443, 8448) to port 8008 with TLS termination.
+
+## Federation endpoints
+
+The beacon info module serves Matrix well-known endpoints directly from Synapse (no nginx snippet needed):
+
+- `/.well-known/matrix/server` — returns `{"m.server": "<SERVER_NAME>:443"}`
+- `/.well-known/matrix/client` — returns `{"m.homeserver": {"base_url": "https://<SERVER_NAME>"}}`
+- `/_synapse/client/beacon/info` — returns region, known servers list, and timestamp
 
 ## Running with Docker
 

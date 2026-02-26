@@ -5,6 +5,7 @@ sed -i "s/{{DB_HOST}}/$DB_HOST/g" /config/homeserver.yaml
 sed -i "s/{{DB_USER}}/$DB_USER/g" /config/homeserver.yaml
 sed -i "s/{{DB_PASS}}/$DB_PASS/g" /config/homeserver.yaml
 sed -i "s/{{DB_NAME}}/$DB_NAME/g" /config/homeserver.yaml
+sed -i "s/{{REDIS_HOST}}/${REDIS_HOST:-redis}/g" /config/shared_config.yaml
 echo "${SIGNING_KEY}" > /config/signing.key
 /usr/local/bin/wait-for.sh $DB_HOST:5432
 

@@ -17,7 +17,7 @@ listeners:
 
 redis:
   enabled: true
-  host: redis
+  host: {{REDIS_HOST}}
 
 report_stats: false
 

@@ -73,10 +73,6 @@ cd docker
 docker build -t beacon-node .
 ```
 
-## Helm chart
-
-A Helm chart is available for Kubernetes deployments. See [tezos-infra/iac/charts/beacon-node](https://gitlab.com/tezos-infra/iac/charts/-/tree/main/beacon-node).
-
 ## License
 
 [MIT](LICENSE)

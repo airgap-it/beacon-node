@@ -31,6 +31,7 @@ docker compose up -d
 | `DB_NAME` | Yes | PostgreSQL database name |
 | `SIGNING_KEY` | Yes | Ed25519 signing key (see below) |
 | `SERVER_REGION` | Yes | Geographic region for beacon info |
+| `REDIS_HOST` | No | Redis hostname (default: `redis`) |
 
 ### Generating a signing key
 
@@ -49,7 +50,7 @@ The image expects the database to be reachable at `DB_HOST` on port 5432. The en
 
 ### Redis
 
-Required for inter-process communication between the main process and the 4 workers. The image has `host: redis` **hardcoded** in `shared_config.yaml`. In Docker Compose the service name `redis` resolves directly. In Kubernetes, an ExternalName service aliases `redis` to the actual Redis service.
+Required for inter-process communication between the main process and the 4 workers. Configurable via the `REDIS_HOST` env var (defaults to `redis` if not set).
 
 Redis does not require authentication (Synapse default).
 

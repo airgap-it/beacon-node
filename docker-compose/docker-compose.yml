@@ -36,6 +36,7 @@ services:
       DB_NAME: synapse
       SERVER_NAME: localhost
       SERVER_REGION: EU
+      REDIS_HOST: redis
       # Generate a real signing key with:
       #   docker run --rm --entrypoint="" ghcr.io/apham0001/beacon-node:latest \
       #     python -m synapse.app.homeserver --generate-keys --config-path /dev/null 2>/dev/null && cat /config/signing.key

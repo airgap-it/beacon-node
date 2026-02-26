@@ -13,7 +13,7 @@ services:
       ENCODING: "UTF8"
       POSTGRES_INITDB_ARGS: "-E UTF8"
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql
   redis:
     image: redis:8-bookworm
     expose:

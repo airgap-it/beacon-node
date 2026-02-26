@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 
 class WellKnownServerResource(Resource):
+    isLeaf = True
+
     def render_GET(self, request):
         server_name = os.environ.get("SERVER_NAME", "localhost")
         request.setHeader(b"content-type", b"application/json")
@@ -15,11 +17,22 @@ class WellKnownServerResource(Resource):
 
 
 class WellKnownClientResource(Resource):
+    isLeaf = True
+
     def render_GET(self, request):
         server_name = os.environ.get("SERVER_NAME", "localhost")
         request.setHeader(b"content-type", b"application/json")
         request.setHeader(b"Access-Control-Allow-Origin", b"*")
         return json.dumps({"m.homeserver": {"base_url": f"https://{server_name}"}}).encode("utf-8")
+
+
+class WellKnownMatrixResource(Resource):
+    """Parent resource for /.well-known/matrix/* endpoints."""
+
+    def __init__(self):
+        super().__init__()
+        self.putChild(b"server", WellKnownServerResource())
+        self.putChild(b"client", WellKnownClientResource())
 
 
 class BeaconInfoModule(Resource):
@@ -29,8 +42,7 @@ class BeaconInfoModule(Resource):
         self.config = config
         self.api = api
         self.api.register_web_resource(path="/_synapse/client/beacon/info", resource=self)
-        self.api.register_web_resource(path="/.well-known/matrix/server", resource=WellKnownServerResource())
-        self.api.register_web_resource(path="/.well-known/matrix/client", resource=WellKnownClientResource())
+        self.api.register_web_resource(path="/.well-known/matrix", resource=WellKnownMatrixResource())
 
     def render(self, request):
         request.setHeader(b"content-type", b"application/json; charset=utf-8")

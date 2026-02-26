@@ -39,6 +39,29 @@ docker run --rm --entrypoint="" ghcr.io/apham0001/beacon-node:latest \
   python -c "import signedjson.key, sys; signedjson.key.write_signing_keys(sys.stdout, [signedjson.key.generate_signing_key('0')])"
 ```
 
+## Dependencies
+
+### PostgreSQL
+
+Required for all Synapse data (rooms, messages, events, users, keys). Synapse requires C locale and UTF8 encoding.
+
+The image expects the database to be reachable at `DB_HOST` on port 5432. The entrypoint waits for PG to be ready before starting Synapse.
+
+### Redis
+
+Required for inter-process communication between the main process and the 4 workers. The image has `host: redis` **hardcoded** in `shared_config.yaml`. In Docker Compose the service name `redis` resolves directly. In Kubernetes, an ExternalName service aliases `redis` to the actual Redis service.
+
+Redis does not require authentication (Synapse default).
+
+## Known servers
+
+The list of known beacon servers is hardcoded in `docker/homeserver.yaml` and served via the `/_synapse/client/beacon/info` endpoint. Clients use this list for server discovery and failover.
+
+Current servers:
+- `beacon-node-1.octez.io` through `beacon-node-8.octez.io`
+
+To update the list, edit `docker/homeserver.yaml` under `modules > beacon_info_module > config > known_servers` and rebuild the image.
+
 ## Ports
 
 | Port | Service |

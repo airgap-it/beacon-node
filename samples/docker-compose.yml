@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:17
+    image: postgres:16-bookworm
     environment:
       POSTGRES_USER: synapse
       POSTGRES_PASSWORD: synapsepassword
@@ -15,7 +15,7 @@ services:
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
   redis:
-    image: redis:7-alpine
+    image: redis:8-bookworm
     expose:
       - "6379"
   tezos-synapse:
@@ -24,8 +24,8 @@ services:
       - postgres
       - redis
     ports:
-      - "8008:8008"
-      - "8083:8083"
+      - "8008:8008" # 8008 is exposed. Route all traffic from port 443 and 8448 to this port
+      - "8083:8083" # exposing the workers for loadbalancing
       - "8084:8084"
       - "8085:8085"
       - "8086:8086"

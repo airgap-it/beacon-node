@@ -39,7 +39,7 @@ jobs:
           cache-from: type=gha
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.34.1
         with:
           image-ref: ${{ env.TEST_TAG }}
           format: "sarif"
@@ -53,7 +53,7 @@ jobs:
           sarif_file: "trivy-results.sarif"
 
       - name: Trivy summary (table)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.34.1
         if: always()
         with:
           image-ref: ${{ env.TEST_TAG }}

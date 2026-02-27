@@ -64,12 +64,17 @@ jobs:
         uses: helm/kind-action@v1
 
       - name: Load image into KIND
-        run: kind load docker-image ${{ env.TEST_TAG }}
+        run: kind load docker-image ${{ env.TEST_TAG }} --name chart-testing
 
       - name: Add subchart repos & build deps
         run: |
           helm repo add kubelauncher https://kubelauncher.github.io/charts
           helm dependency build charts/
+
+      - name: Generate signing key
+        run: |
+          SIGNING_KEY="ed25519 a_test $(openssl rand -base64 32)"
+          echo "SIGNING_KEY=${SIGNING_KEY}" >> "$GITHUB_ENV"
 
       - name: Install chart
         run: |
@@ -79,7 +84,7 @@ jobs:
             --set image.digest="" \
             --set image.pullPolicy=Never \
             --set serverName=beacon-node-test.local \
-            --set signingKey="ed25519 a_test $(openssl rand -base64 32)" \
+            --set "signingKey=${SIGNING_KEY}" \
             --set postgresql.enabled=true \
             --set postgresql.auth.password=testpass \
             --set postgresql.auth.postgresPassword=testpass \
@@ -87,7 +92,12 @@ jobs:
             --set ingress.enabled=false \
             --set workers.enabled=true \
             --wait \
-            --timeout 180s
+            --timeout 300s
+
+      - name: Verify all pods
+        run: |
+          kubectl get pods
+          kubectl get pods -o wide
 
       - name: Verify pods are running
         run: |
@@ -106,20 +116,36 @@ jobs:
           fi
           echo "No FATAL errors in logs"
 
-      - name: Smoke test well-known endpoints
+      - name: Smoke test Synapse endpoints
         run: |
           POD=$(kubectl get pod -l app.kubernetes.io/name=beacon-node -o jsonpath='{.items[0].metadata.name}')
-          echo "--- Testing /.well-known/matrix/server ---"
+
+          echo "--- /.well-known/matrix/server ---"
           RESPONSE=$(kubectl exec "$POD" -- curl -sf http://localhost:8008/.well-known/matrix/server)
           echo "$RESPONSE"
-          echo "$RESPONSE" | grep -q "m.server" || (echo "FAIL: well-known/server missing m.server" && exit 1)
+          echo "$RESPONSE" | grep -q "m.server" || (echo "FAIL: missing m.server" && exit 1)
 
-          echo "--- Testing /.well-known/matrix/client ---"
+          echo "--- /.well-known/matrix/client ---"
           RESPONSE=$(kubectl exec "$POD" -- curl -sf http://localhost:8008/.well-known/matrix/client)
           echo "$RESPONSE"
-          echo "$RESPONSE" | grep -q "m.homeserver" || (echo "FAIL: well-known/client missing m.homeserver" && exit 1)
+          echo "$RESPONSE" | grep -q "m.homeserver" || (echo "FAIL: missing m.homeserver" && exit 1)
 
-          echo "Smoke tests passed"
+          echo "--- /_matrix/client/versions ---"
+          RESPONSE=$(kubectl exec "$POD" -- curl -sf http://localhost:8008/_matrix/client/versions)
+          echo "$RESPONSE"
+          echo "$RESPONSE" | grep -q "versions" || (echo "FAIL: missing versions" && exit 1)
+
+          echo "--- /_matrix/federation/v1/version ---"
+          RESPONSE=$(kubectl exec "$POD" -- curl -sf http://localhost:8008/_matrix/federation/v1/version)
+          echo "$RESPONSE"
+          echo "$RESPONSE" | grep -q "1.148.0" || (echo "FAIL: unexpected Synapse version" && exit 1)
+
+          echo "--- /_matrix/client/v3/login ---"
+          RESPONSE=$(kubectl exec "$POD" -- curl -sf http://localhost:8008/_matrix/client/v3/login)
+          echo "$RESPONSE"
+          echo "$RESPONSE" | grep -q "m.login.password" || (echo "FAIL: login flow missing" && exit 1)
+
+          echo "All smoke tests passed"
 
       - name: Debug on failure
         if: failure()

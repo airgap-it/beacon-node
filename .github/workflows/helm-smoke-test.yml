@@ -1,0 +1,136 @@
+name: Helm Lint & Smoke Test
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "charts/**"
+      - "docker/**"
+      - ".github/workflows/helm-smoke-test.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "charts/**"
+      - "docker/**"
+      - ".github/workflows/helm-smoke-test.yml"
+
+env:
+  TEST_TAG: beacon-node:test
+
+jobs:
+  helm-lint:
+    name: Helm Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Add subchart repos
+        run: helm repo add kubelauncher https://kubelauncher.github.io/charts
+
+      - name: Build dependencies
+        run: helm dependency build charts/
+
+      - name: Lint chart
+        run: helm lint charts/
+
+  smoke-test:
+    name: KIND Smoke Test
+    runs-on: ubuntu-latest
+    needs: helm-lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./docker/
+          load: true
+          tags: ${{ env.TEST_TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Create KIND cluster
+        uses: helm/kind-action@v1
+
+      - name: Load image into KIND
+        run: kind load docker-image ${{ env.TEST_TAG }}
+
+      - name: Add subchart repos & build deps
+        run: |
+          helm repo add kubelauncher https://kubelauncher.github.io/charts
+          helm dependency build charts/
+
+      - name: Install chart
+        run: |
+          helm install beacon-node charts/ \
+            --set image.repository=beacon-node \
+            --set image.tag=test \
+            --set image.digest="" \
+            --set image.pullPolicy=Never \
+            --set serverName=beacon-node-test.local \
+            --set signingKey="ed25519 a_test $(openssl rand -base64 32)" \
+            --set postgresql.enabled=true \
+            --set postgresql.auth.password=testpass \
+            --set postgresql.auth.postgresPassword=testpass \
+            --set redis.enabled=true \
+            --set ingress.enabled=false \
+            --set workers.enabled=true \
+            --wait \
+            --timeout 180s
+
+      - name: Verify pods are running
+        run: |
+          kubectl get pods
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=beacon-node --timeout=120s
+          echo "All beacon-node pods are ready"
+
+      - name: Check beacon-node logs for errors
+        run: |
+          POD=$(kubectl get pod -l app.kubernetes.io/name=beacon-node -o jsonpath='{.items[0].metadata.name}')
+          kubectl logs "$POD" --tail=50
+          # Fail if FATAL errors (exclude expected startup warnings)
+          if kubectl logs "$POD" | grep -i "FATAL" | grep -v "reserved for"; then
+            echo "FATAL errors found in logs"
+            exit 1
+          fi
+          echo "No FATAL errors in logs"
+
+      - name: Smoke test well-known endpoints
+        run: |
+          POD=$(kubectl get pod -l app.kubernetes.io/name=beacon-node -o jsonpath='{.items[0].metadata.name}')
+          echo "--- Testing /.well-known/matrix/server ---"
+          RESPONSE=$(kubectl exec "$POD" -- curl -sf http://localhost:8008/.well-known/matrix/server)
+          echo "$RESPONSE"
+          echo "$RESPONSE" | grep -q "m.server" || (echo "FAIL: well-known/server missing m.server" && exit 1)
+
+          echo "--- Testing /.well-known/matrix/client ---"
+          RESPONSE=$(kubectl exec "$POD" -- curl -sf http://localhost:8008/.well-known/matrix/client)
+          echo "$RESPONSE"
+          echo "$RESPONSE" | grep -q "m.homeserver" || (echo "FAIL: well-known/client missing m.homeserver" && exit 1)
+
+          echo "Smoke tests passed"
+
+      - name: Debug on failure
+        if: failure()
+        run: |
+          echo "=== Pod status ==="
+          kubectl get pods -o wide
+          echo "=== Events ==="
+          kubectl get events --sort-by='.lastTimestamp'
+          echo "=== Beacon node logs ==="
+          POD=$(kubectl get pod -l app.kubernetes.io/name=beacon-node -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+          [ -n "$POD" ] && kubectl logs "$POD" --tail=100
+          echo "=== PostgreSQL logs ==="
+          PG_POD=$(kubectl get pod -l app.kubernetes.io/name=postgresql -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+          [ -n "$PG_POD" ] && kubectl logs "$PG_POD" --tail=50

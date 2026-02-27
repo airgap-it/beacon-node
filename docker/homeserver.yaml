@@ -134,7 +134,7 @@ url_preview_enabled: false
 
 redis:
   enabled: true
-  host: redis
+  host: {{REDIS_HOST}}
 
 ## Caching - Performance optimizations
 caches:

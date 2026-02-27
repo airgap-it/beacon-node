@@ -1,0 +1,27 @@
+apiVersion: v2
+name: beacon-node
+description: A Helm chart for deploying Beacon Node (Matrix Synapse fork with crypto authentication)
+type: application
+version: 0.4.1
+appVersion: "1.148.0"
+
+keywords:
+  - matrix
+  - synapse
+  - beacon
+  - airgap
+  - crypto-auth
+
+home: https://github.com/apham0001/beacon-node
+sources:
+  - https://github.com/apham0001/beacon-node
+
+dependencies:
+  - name: postgresql
+    version: "0.2.8"
+    repository: https://kubelauncher.github.io/charts
+    condition: postgresql.enabled
+  - name: redis
+    version: "0.2.15"
+    repository: https://kubelauncher.github.io/charts
+    condition: redis.enabled

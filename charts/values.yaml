@@ -1,0 +1,281 @@
+# Beacon Node Helm Chart Values
+# ==============================
+
+# -- Number of replicas (only 1 supported due to Synapse architecture)
+replicaCount: 1
+
+image:
+  # -- Container image repository
+  repository: ghcr.io/apham0001/beacon-node
+  # -- Image pull policy
+  pullPolicy: Always
+  # -- Image tag
+  tag: "latest"
+  # -- Image digest (optional, for pinning exact image version)
+  # Example: "sha256:abc123..."
+  digest: ""
+
+# -- Image pull secrets for private registries
+imagePullSecrets: []
+
+# -- Override the chart name
+nameOverride: ""
+# -- Override the full release name
+fullnameOverride: ""
+
+# =============================================================================
+# Beacon Node Configuration
+# =============================================================================
+
+# -- Matrix server name (FQDN). This MUST match your domain.
+# Example: matrix.example.com
+serverName: "matrix.example.com"
+
+# -- Geographic region for beacon info endpoint
+serverRegion: "EU"
+
+# -- Ed25519 signing key for Matrix federation
+# Format: "ed25519 a_XXXX <base64-encoded-32-byte-key>"
+# IMPORTANT: The base64-encoded seed MUST decode to exactly 32 bytes!
+# Generate with:
+#   python3 -c "import base64,os; print(f'ed25519 a_{os.urandom(2).hex()} {base64.b64encode(os.urandom(32)).decode()}')"
+# If not provided, a deterministic key is auto-generated based on release name.
+# WARNING: Auto-generated keys are NOT secure for production - always provide your own key!
+signingKey: ""
+
+# -- Use an existing secret for the signing key instead of creating one
+# If set, signingKey value is ignored
+existingSigningKeySecret:
+  # -- Name of the existing secret containing the signing key
+  name: ""
+  # -- Key in the secret that contains the signing key value
+  key: "SIGNING_KEY"
+
+# -- Shared secret for user registration (optional)
+registrationSharedSecret: ""
+
+# =============================================================================
+# Workers Configuration
+# =============================================================================
+
+workers:
+  # -- Enable Synapse workers (4 generic workers on ports 8083-8086)
+  # Worker count is fixed at 4 in the Docker image (hardcoded worker configs)
+  enabled: true
+
+# =============================================================================
+# PostgreSQL Configuration (kubelauncher subchart)
+# =============================================================================
+
+postgresql:
+  # -- Deploy PostgreSQL as a subchart
+  enabled: true
+  auth:
+    # -- PostgreSQL username
+    username: synapse
+    # -- PostgreSQL password (REQUIRED if postgresql.enabled=true)
+    password: ""
+    # -- PostgreSQL database name
+    database: synapse
+  primary:
+    # -- initdb configuration (IMPORTANT: Synapse requires C locale)
+    initdb:
+      args: "--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+    # -- PostgreSQL configuration
+    # Synapse workers use cp_min=20, cp_max=80 connections per process
+    # With 4 workers + 1 main: 5 * 80 + buffer = 300
+    configuration: |
+      max_connections = 300
+    persistence:
+      # -- Enable persistence for PostgreSQL
+      enabled: true
+      # -- Storage size for PostgreSQL
+      size: 10Gi
+    # -- PostgreSQL resource limits
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+
+# =============================================================================
+# External Database Configuration (when postgresql.enabled=false)
+# =============================================================================
+
+externalDatabase:
+  # -- External PostgreSQL host
+  host: ""
+  # -- External PostgreSQL port
+  port: 5432
+  # -- External PostgreSQL username
+  username: synapse
+  # -- External PostgreSQL password
+  password: ""
+  # -- External PostgreSQL database name
+  database: synapse
+
+# =============================================================================
+# Redis Configuration (kubelauncher subchart)
+# =============================================================================
+
+redis:
+  # -- Deploy Redis as a subchart (required for workers)
+  enabled: true
+  # -- Redis architecture (standalone or replication)
+  architecture: standalone
+  auth:
+    # -- Disable Redis authentication (Synapse default)
+    enabled: false
+  master:
+    persistence:
+      # -- Enable persistence for Redis
+      enabled: true
+      # -- Storage size for Redis
+      size: 1Gi
+    # -- Redis resource limits
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 50m
+      limits:
+        memory: 256Mi
+        cpu: 200m
+
+# =============================================================================
+# Monitoring Configuration
+# =============================================================================
+
+monitoring:
+  # -- Enable ServiceMonitor for Prometheus scraping
+  enabled: false
+  # -- Prometheus release label for service discovery
+  prometheusRelease: prometheus-stack
+  # -- Metrics endpoint path
+  path: /_synapse/metrics
+  # -- Scrape interval
+  interval: 30s
+  # -- Scrape timeout
+  scrapeTimeout: 10s
+
+# =============================================================================
+# Service Configuration
+# =============================================================================
+
+service:
+  # -- Service type (ClusterIP, NodePort, LoadBalancer)
+  type: ClusterIP
+  # -- Main client/federation port
+  port: 8008
+
+# =============================================================================
+# Ingress Configuration
+# =============================================================================
+
+ingress:
+  # -- Enable ingress
+  enabled: false
+  # -- Ingress class name
+  className: "nginx"
+  # -- Ingress annotations
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # Federation requests can take longer, increase timeouts
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+  # -- Ingress hosts configuration
+  hosts:
+    - host: matrix.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  # -- Ingress TLS configuration
+  tls:
+    - secretName: beacon-node-tls
+      hosts:
+        - matrix.example.com
+
+# =============================================================================
+# Resources Configuration
+# =============================================================================
+
+resources:
+  requests:
+    memory: 512Mi
+    cpu: 250m
+  limits:
+    memory: 2Gi
+    cpu: 1000m
+
+# =============================================================================
+# Pod Configuration
+# =============================================================================
+
+# -- Node selector for pod scheduling
+nodeSelector: {}
+
+# -- Tolerations for pod scheduling
+tolerations: []
+
+# -- Affinity rules for pod scheduling
+affinity: {}
+
+# -- Pod annotations
+podAnnotations: {}
+
+# -- Pod security context
+podSecurityContext: {}
+
+# -- Container security context
+securityContext: {}
+
+# =============================================================================
+# Probes Configuration
+# =============================================================================
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# =============================================================================
+# Persistence Configuration
+# =============================================================================
+
+persistence:
+  # -- Enable persistence for Synapse data
+  enabled: true
+  # -- Storage class (leave empty for default)
+  storageClass: ""
+  # -- Access modes
+  accessModes:
+    - ReadWriteOnce
+  # -- Storage size
+  size: 5Gi
+
+# =============================================================================
+# Service Account Configuration
+# =============================================================================
+
+serviceAccount:
+  # -- Create a service account
+  create: true
+  # -- Service account annotations
+  annotations: {}
+  # -- Service account name (generated if not set)
+  name: ""

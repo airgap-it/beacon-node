@@ -25,8 +25,11 @@ COPY workers /config/workers
 COPY shared_config.yaml /config/
 COPY beacon_info_module.py /usr/local/lib/python3.13/site-packages/
 
-# run change on max size
-RUN sed -i 's/65536/1048576/' /usr/local/lib/python3.13/site-packages/synapse/api/constants.py
+# Increase max event size (1MB instead of default 64KB).
+# Beacon messages can exceed the default Matrix PDU size limit.
+RUN sed -i 's/^MAX_PDU_SIZE = 65536$/MAX_PDU_SIZE = 1048576/' /usr/local/lib/python3.13/site-packages/synapse/api/constants.py && \
+    grep -q '^MAX_PDU_SIZE = 1048576$' /usr/local/lib/python3.13/site-packages/synapse/api/constants.py || \
+    (echo "FATAL: PDU size patch failed - 'MAX_PDU_SIZE = 65536' not found in constants.py. Upstream may have changed." >&2 && exit 1)
 
 COPY wait-for.sh /usr/local/bin/
 COPY synctl_entrypoint.sh /usr/local/bin/

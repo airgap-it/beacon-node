@@ -1,0 +1,21 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "beacon-node.fullname" . }}
+  labels:
+    {{- include "beacon-node.labels" . | nindent 4 }}
+    {{- if .Values.monitoring.prometheusRelease }}
+    release: {{ .Values.monitoring.prometheusRelease }}
+    {{- end }}
+spec:
+  jobLabel: app.kubernetes.io/name
+  selector:
+    matchLabels:
+      {{- include "beacon-node.selectorLabels" . | nindent 6 }}
+  endpoints:
+  - port: http
+    path: {{ .Values.monitoring.path }}
+    interval: {{ .Values.monitoring.interval }}
+    scrapeTimeout: {{ .Values.monitoring.scrapeTimeout }}
+{{- end }}

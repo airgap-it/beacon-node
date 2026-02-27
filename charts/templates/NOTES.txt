@@ -1,0 +1,74 @@
+===============================================================================
+  Beacon Node has been deployed!
+===============================================================================
+
+Server Name: {{ .Values.serverName }}
+Server Region: {{ .Values.serverRegion }}
+
+{{- if .Values.ingress.enabled }}
+
+Your beacon node is accessible at:
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  https://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+
+{{- else }}
+
+To access your beacon node, run:
+
+  kubectl port-forward --namespace {{ .Release.Namespace }} svc/{{ include "beacon-node.fullname" . }} 8008:{{ .Values.service.port }}
+
+Then open: http://localhost:8008
+
+{{- end }}
+
+To verify the deployment, check the beacon info endpoint:
+
+{{- if .Values.ingress.enabled }}
+  curl https://{{ (index .Values.ingress.hosts 0).host }}/_synapse/client/beacon/info
+{{- else }}
+  # After port-forwarding:
+  curl http://localhost:8008/_synapse/client/beacon/info
+{{- end }}
+
+Expected response:
+  {"region": "{{ .Values.serverRegion }}", "known_servers": [...], "timestamp": ...}
+
+===============================================================================
+  Important Notes
+===============================================================================
+
+{{- if not .Values.signingKey }}
+
+WARNING: No signing key was provided!
+The deployment may fail without a valid Ed25519 signing key.
+
+Generate one with:
+  docker run --rm matrixdotorg/synapse generate
+
+Then upgrade the release:
+  helm upgrade {{ .Release.Name }} beacon-node --set signingKey="ed25519 a_XXXX <key>"
+
+{{- end }}
+
+{{- if .Values.postgresql.enabled }}
+{{- if not .Values.postgresql.auth.password }}
+
+WARNING: No PostgreSQL password was provided!
+Please set postgresql.auth.password for production deployments.
+
+{{- end }}
+{{- end }}
+
+Database: {{ include "beacon-node.postgresql.host" . }}:5432/{{ include "beacon-node.postgresql.database" . }}
+Redis: {{ include "beacon-node.redis.host" . }}:6379
+
+{{- if .Values.workers.enabled }}
+
+Workers: 4 generic workers enabled (ports 8083-8086)
+
+{{- end }}
+
+For more information, visit: https://github.com/apham0001/beacon-node

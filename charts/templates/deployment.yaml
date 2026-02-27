@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "beacon-node.fullname" . }}
+  labels:
+    {{- include "beacon-node.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "beacon-node.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "beacon-node.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "beacon-node.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.image.digest }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}@{{ .Values.image.digest }}"
+          {{- else }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "beacon-node.fullname" . }}
+            - secretRef:
+                name: {{ include "beacon-node.fullname" . }}
+          env:
+            {{- if and .Values.existingSigningKeySecret .Values.existingSigningKeySecret.name }}
+            # Signing key from existing secret (e.g., ExternalSecret)
+            - name: SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.existingSigningKeySecret.name }}
+                  key: {{ .Values.existingSigningKeySecret.key | default "SIGNING_KEY" }}
+            {{- end }}
+            # Database password from appropriate secret
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "beacon-node.postgresql.secretName" . }}
+                  key: {{ include "beacon-node.postgresql.secretKey" . }}
+          ports:
+            - name: http
+              containerPort: 8008
+              protocol: TCP
+            {{- if .Values.workers.enabled }}
+            - name: worker-1
+              containerPort: 8083
+              protocol: TCP
+            - name: worker-2
+              containerPort: 8084
+              protocol: TCP
+            - name: worker-3
+              containerPort: 8085
+              protocol: TCP
+            - name: worker-4
+              containerPort: 8086
+              protocol: TCP
+            {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "beacon-node.fullname" . }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
